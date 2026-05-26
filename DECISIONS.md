@@ -108,6 +108,29 @@ working v1, then iterate with her on v2.
 - **Cadence implication:** The Supabase open questions from Cadence no
   longer apply to Roost. The two projects now use different backends.
 
+### 2026-05-26 — Smart eBird sync + gentle gamification (Bingo)
+
+- **Decision: Smart sync.** Instead of requiring manual CSV imports,
+  Roost now proximity-matches eBird nearby observations. Sightings
+  within ~150m of home are auto-tagged as "yours." Joelle sets up
+  Merlin → eBird once, and her sightings flow into Roost on each
+  app open. CSV import remains available for historical bulk data.
+- **Decision: Bingo game.** A daily 3×3 bingo card with gentle birding
+  challenges — species to spot, counts to hit, nature to notice. Pulls
+  from real eBird data so challenges are achievable. Completing a row
+  or card earns an egg/badge. Tracked in a trophy case.
+- **Why gamification now?** CLAUDE.md says "no streaks, no badges" — and
+  that still holds for the *core app*. The bingo is supplementary: tucked
+  in a settings/menu drawer, discovered by seeking it, never imposed.
+  The emotional register is "the neighborhood is playing a game with you,"
+  not "grind your streak." If it ever feels like pressure, it gets cut.
+- **Where it lives:** Settings/menu drawer, not a main tab. The three
+  core tabs (Map, Journal, Birds) remain the heart of the app. Bingo
+  is a delightful extra, not the front door.
+- **What doesn't change:** Core purpose (neighborhood as character),
+  emotional register (calm, slow, intimate), three-layer data model
+  (Map, Journal, Deck).
+
 ### Build Tracker
 
 - **Status:** Not yet created. Add `roost-tracker.html` per the

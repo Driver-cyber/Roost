@@ -24,9 +24,17 @@
 </head>
 <body>
   <div class="app">
-    <!-- Voice line -->
-    <div class="voice-line" id="voice-line-wrap">
-      <p id="voice-text"></p>
+    <!-- Header: voice line + settings gear -->
+    <div class="app-header">
+      <div class="voice-line" id="voice-line-wrap">
+        <p id="voice-text"></p>
+      </div>
+      <button class="gear-btn" id="btn-settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </button>
     </div>
 
     <!-- Views -->
@@ -105,6 +113,85 @@
         <span>Birds</span>
       </button>
     </nav>
+  </div>
+
+  <!-- ============ SETTINGS DRAWER ============ -->
+  <div class="drawer-overlay" id="drawer-overlay">
+    <div class="drawer" id="drawer">
+      <div class="drawer-header">
+        <h2>Roost</h2>
+        <button class="drawer-close" id="btn-drawer-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-label">Sync</div>
+        <div class="sync-status" id="sync-status">
+          <span class="sync-dot"></span>
+          <span>Connected to eBird</span>
+        </div>
+        <div class="sync-detail" id="sync-detail">Refreshes on each app open</div>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-label">Play</div>
+        <button class="drawer-item" id="btn-bingo">
+          <span class="drawer-item-icon">🎯</span>
+          <div class="drawer-item-text">
+            <div class="drawer-item-title">Daily Bingo</div>
+            <div class="drawer-item-desc">Today's birding challenge</div>
+          </div>
+          <span class="drawer-item-badge" id="bingo-badge"></span>
+        </button>
+        <button class="drawer-item" id="btn-trophies">
+          <span class="drawer-item-icon">🥚</span>
+          <div class="drawer-item-text">
+            <div class="drawer-item-title">Trophy Case</div>
+            <div class="drawer-item-desc">Your earned badges</div>
+          </div>
+          <span class="drawer-item-badge" id="trophy-count"></span>
+        </button>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-label">Data</div>
+        <button class="drawer-item" id="btn-drawer-import">
+          <span class="drawer-item-icon">📂</span>
+          <div class="drawer-item-text">
+            <div class="drawer-item-title">Import eBird CSV</div>
+            <div class="drawer-item-desc">Bulk import your history</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="drawer-footer">
+        <span>Roost v1 — for Joelle</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BINGO SCREEN ============ -->
+  <div class="modal-overlay" id="modal-bingo">
+    <div class="modal bingo-modal">
+      <div class="modal-handle"></div>
+      <h2>Daily Bingo</h2>
+      <div class="bingo-date" id="bingo-date"></div>
+      <div class="bingo-grid" id="bingo-grid"></div>
+      <div class="bingo-reward" id="bingo-reward"></div>
+      <button class="btn-secondary" id="btn-bingo-close" style="margin-top:16px">Back</button>
+    </div>
+  </div>
+
+  <!-- ============ TROPHY CASE ============ -->
+  <div class="modal-overlay" id="modal-trophies">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2>Trophy Case</h2>
+      <div class="trophy-grid" id="trophy-grid"></div>
+      <div class="trophy-empty" id="trophy-empty"></div>
+      <button class="btn-secondary" id="btn-trophies-close" style="margin-top:16px">Back</button>
+    </div>
   </div>
 
   <!-- ============ ADD SIGHTING MODAL ============ -->
