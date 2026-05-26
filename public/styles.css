@@ -1008,6 +1008,11 @@ html, body {
   padding-left: 16px;
 }
 
+a.drawer-item {
+  text-decoration: none;
+  color: inherit;
+}
+
 .drawer-item {
   display: flex;
   align-items: center;
