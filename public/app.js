@@ -3,6 +3,13 @@
 // ================================================================
 
 const API = '/api';
+
+function authHeaders(extra = {}) {
+  const token = localStorage.getItem('roost-auth-token');
+  const headers = { ...extra };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
 const HOME = { lat: 45.6191, lon: -122.5484 };
 
 // ----------------------------------------------------------------
@@ -142,7 +149,7 @@ function initModal() {
     try {
       await fetch(`${API}/sightings`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(sighting),
       });
     } catch (_) {
@@ -267,7 +274,7 @@ function initCSVImport() {
       for (const s of state.sightings.filter(s => s.source === 'csv')) {
         await fetch(`${API}/sightings`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify(s),
         });
       }
@@ -730,6 +737,23 @@ function initDrawer() {
     openOverlay(addModal);
     document.getElementById('form-sighting').style.display = 'none';
     document.getElementById('csv-import-section').style.display = '';
+  });
+
+  // Auth token
+  const tokenInput = document.getElementById('input-auth-token');
+  const tokenBtn = document.getElementById('btn-save-token');
+  const authStatus = document.getElementById('auth-status');
+  const saved = localStorage.getItem('roost-auth-token');
+  if (saved) authStatus.textContent = 'Token saved ✓';
+
+  tokenBtn.addEventListener('click', () => {
+    const val = tokenInput.value.trim();
+    if (val) {
+      localStorage.setItem('roost-auth-token', val);
+      tokenInput.value = '';
+      authStatus.textContent = 'Token saved ✓';
+      toast('Auth token saved');
+    }
   });
 }
 
