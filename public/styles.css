@@ -33,6 +33,7 @@
 
 html, body {
   height: 100%;
+  height: 100dvh;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-ui);
@@ -42,19 +43,24 @@ html, body {
   overscroll-behavior: none;
   user-select: none;
   -webkit-user-select: none;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }
 
 /* ================================================================
-   APP SHELL
+   APP SHELL — fixed header + footer, scrollable middle
    ================================================================ */
 
 .app {
   display: flex;
   flex-direction: column;
   height: 100%;
+  height: 100dvh;
   max-width: 430px;
   margin: 0 auto;
   position: relative;
+  overflow: hidden;
 }
 
 /* ================================================================
@@ -62,10 +68,12 @@ html, body {
    ================================================================ */
 
 .voice-line {
-  padding: 14px 24px 10px;
-  padding-top: calc(14px + var(--safe-top));
+  padding: 10px 24px 8px;
+  padding-top: calc(12px + var(--safe-top));
   text-align: center;
-  min-height: 52px;
+  flex-shrink: 0;
+  background: var(--paper);
+  z-index: 10;
 }
 
 .voice-line p {
@@ -93,12 +101,12 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
+  min-height: 0;
 }
 
 .view {
   display: none;
-  min-height: 100%;
+  padding-bottom: 20px;
   animation: viewFadeIn 0.25s ease;
 }
 
@@ -124,8 +132,9 @@ html, body {
 
 #view-map #map {
   width: 100%;
-  height: 55vh;
-  min-height: 300px;
+  height: 44dvh;
+  min-height: 260px;
+  max-height: 400px;
   background: #e8e0d0;
 }
 
@@ -301,7 +310,7 @@ html, body {
    JOURNAL VIEW
    ================================================================ */
 
-#view-journal { padding: 20px 18px; padding-top: calc(20px + var(--safe-top)); }
+#view-journal { padding: 20px 18px; }
 
 .journal-header {
   display: flex;
@@ -400,7 +409,7 @@ html, body {
    DECK VIEW — species card collection
    ================================================================ */
 
-#view-deck { padding: 20px 14px; padding-top: calc(20px + var(--safe-top)); }
+#view-deck { padding: 20px 14px; }
 
 .deck-header {
   display: flex;
@@ -506,9 +515,9 @@ html, body {
    ================================================================ */
 
 .fab {
-  position: fixed;
-  bottom: calc(68px + var(--safe-bottom));
-  right: calc(50% - 215px + 16px);
+  position: absolute;
+  bottom: calc(62px + var(--safe-bottom));
+  right: 16px;
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -540,7 +549,7 @@ html, body {
 }
 
 @media (min-width: 431px) {
-  .fab { right: calc(50% - 199px); }
+  .fab { right: calc(50% - 200px); }
 }
 
 .modal-overlay {
@@ -793,6 +802,7 @@ html, body {
   background: var(--paper);
   padding-bottom: var(--safe-bottom);
   flex-shrink: 0;
+  z-index: 10;
 }
 
 .tab {
@@ -838,7 +848,7 @@ html, body {
    ================================================================ */
 
 .toast {
-  position: fixed;
+  position: absolute;
   top: calc(12px + var(--safe-top));
   left: 50%;
   transform: translateX(-50%) translateY(-120%);
