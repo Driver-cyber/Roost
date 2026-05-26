@@ -72,11 +72,19 @@ html, body {
 .app-header {
   display: flex;
   align-items: flex-start;
-  padding-top: var(--safe-top);
+  padding-top: calc(var(--safe-top) + 8px);
   background: var(--paper);
   flex-shrink: 0;
   z-index: 10;
   position: relative;
+}
+
+@supports (padding-top: env(safe-area-inset-top)) {
+  @media all and (display-mode: standalone) {
+    .app-header {
+      padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+    }
+  }
 }
 
 .voice-line {
