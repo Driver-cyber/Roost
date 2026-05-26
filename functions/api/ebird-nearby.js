@@ -5,8 +5,8 @@ export async function onRequestGet(context) {
     return Response.json({ error: 'eBird API key not configured' }, { status: 503 });
   }
 
-  const lat = env.HOME_LAT || '40.7312';
-  const lon = env.HOME_LON || '-74.2732';
+  const lat = env.HOME_LAT || '45.6191';
+  const lon = env.HOME_LON || '-122.5484';
   const radius = env.EBIRD_RADIUS_KM || '5';
   const days = env.EBIRD_DAYS_BACK || '7';
 

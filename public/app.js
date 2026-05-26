@@ -3,7 +3,7 @@
 // ================================================================
 
 const API = '/api';
-const HOME = { lat: 40.7312, lon: -74.2732 }; // Maplewood, NJ default — override with real coords
+const HOME = { lat: 45.6191, lon: -122.5484 };
 
 // ----------------------------------------------------------------
 // State
@@ -595,34 +595,206 @@ function initMap() {
 }
 
 function mapStyle() {
+  const PMTILES_URL = 'https://demo-bucket.protomaps.com/v4.pmtiles';
+  const P = '#f4ede0'; // paper
+  const PW = '#fef6e3'; // paper-warm
+  const INK = '#2b2218';
+  const SOFT = '#6b5d4a';
+  const FAINT = '#c4b9a8';
+  const MOSS = '#7a9e6b';
+  const MOSSD = '#4a6b3a';
+  const SKY = '#b8cdd9';
+  const SKYF = '#a8c2d2';
+  const SAND = '#e8dfd0';
+
   return {
     version: 8,
     name: 'Roost Paper',
     sources: {
-      'osm-tiles': {
-        type: 'raster',
-        tiles: [
-          'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-        ],
-        tileSize: 256,
-        attribution: '© OpenStreetMap contributors',
+      protomaps: {
+        type: 'vector',
+        url: `pmtiles://${PMTILES_URL}`,
+        attribution: '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
       }
     },
+    glyphs: 'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
     layers: [
-      {
-        id: 'osm-base',
-        type: 'raster',
-        source: 'osm-tiles',
+      // Background
+      { id: 'background', type: 'background', paint: { 'background-color': P } },
+
+      // Earth / land
+      { id: 'earth', type: 'fill', source: 'protomaps', 'source-layer': 'earth',
+        paint: { 'fill-color': P } },
+
+      // Water
+      { id: 'water', type: 'fill', source: 'protomaps', 'source-layer': 'water',
+        paint: { 'fill-color': SKY } },
+
+      // Landuse — parks, forests, green
+      { id: 'landuse-park', type: 'fill', source: 'protomaps', 'source-layer': 'landuse',
+        filter: ['any',
+          ['==', ['get', 'pmap:kind'], 'park'],
+          ['==', ['get', 'pmap:kind'], 'nature_reserve'],
+          ['==', ['get', 'pmap:kind'], 'forest'],
+          ['==', ['get', 'pmap:kind'], 'garden'],
+        ],
+        paint: { 'fill-color': '#dde8d4', 'fill-opacity': 0.6 } },
+
+      // Landuse — residential, commercial
+      { id: 'landuse-urban', type: 'fill', source: 'protomaps', 'source-layer': 'landuse',
+        filter: ['any',
+          ['==', ['get', 'pmap:kind'], 'residential'],
+          ['==', ['get', 'pmap:kind'], 'commercial'],
+        ],
+        paint: { 'fill-color': PW, 'fill-opacity': 0.4 } },
+
+      // Buildings
+      { id: 'buildings', type: 'fill', source: 'protomaps', 'source-layer': 'buildings',
+        minzoom: 14,
         paint: {
-          'raster-saturation': -0.7,
-          'raster-brightness-min': 0.15,
-          'raster-brightness-max': 0.92,
-          'raster-contrast': -0.1,
-          'raster-opacity': 0.85,
-        }
-      }
-    ],
-    glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
+          'fill-color': SAND,
+          'fill-opacity': ['interpolate', ['linear'], ['zoom'], 14, 0.1, 16, 0.35],
+        } },
+
+      // Roads — minor
+      { id: 'roads-minor', type: 'line', source: 'protomaps', 'source-layer': 'roads',
+        filter: ['any',
+          ['==', ['get', 'pmap:kind'], 'minor_road'],
+          ['==', ['get', 'pmap:kind'], 'other'],
+        ],
+        paint: {
+          'line-color': FAINT,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.5, 16, 2.5],
+          'line-opacity': 0.6,
+        } },
+
+      // Roads — medium
+      { id: 'roads-medium', type: 'line', source: 'protomaps', 'source-layer': 'roads',
+        filter: ['==', ['get', 'pmap:kind'], 'medium_road'],
+        paint: {
+          'line-color': FAINT,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 1, 16, 4],
+          'line-opacity': 0.7,
+        } },
+
+      // Roads — major
+      { id: 'roads-major', type: 'line', source: 'protomaps', 'source-layer': 'roads',
+        filter: ['==', ['get', 'pmap:kind'], 'major_road'],
+        paint: {
+          'line-color': '#b8a990',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 8, 1, 16, 5],
+          'line-opacity': 0.7,
+        } },
+
+      // Roads — highway
+      { id: 'roads-highway', type: 'line', source: 'protomaps', 'source-layer': 'roads',
+        filter: ['==', ['get', 'pmap:kind'], 'highway'],
+        paint: {
+          'line-color': '#b0a08a',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 6, 1, 16, 6],
+          'line-opacity': 0.5,
+        } },
+
+      // Waterway lines (creeks, rivers)
+      { id: 'waterways', type: 'line', source: 'protomaps', 'source-layer': 'water',
+        paint: {
+          'line-color': SKYF,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0.5, 16, 2],
+        } },
+
+      // Place labels — neighborhoods, suburbs
+      { id: 'labels-neighborhood', type: 'symbol', source: 'protomaps', 'source-layer': 'places',
+        filter: ['any',
+          ['==', ['get', 'pmap:kind'], 'neighbourhood'],
+          ['==', ['get', 'pmap:kind'], 'suburb'],
+        ],
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': ['interpolate', ['linear'], ['zoom'], 12, 11, 16, 14],
+          'text-transform': 'uppercase',
+          'text-letter-spacing': 0.08,
+        },
+        paint: {
+          'text-color': SOFT,
+          'text-halo-color': P,
+          'text-halo-width': 1.5,
+          'text-opacity': 0.8,
+        } },
+
+      // Place labels — towns, cities
+      { id: 'labels-places', type: 'symbol', source: 'protomaps', 'source-layer': 'places',
+        filter: ['any',
+          ['==', ['get', 'pmap:kind'], 'city'],
+          ['==', ['get', 'pmap:kind'], 'town'],
+          ['==', ['get', 'pmap:kind'], 'village'],
+        ],
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Medium'],
+          'text-size': ['interpolate', ['linear'], ['zoom'], 8, 12, 14, 16],
+        },
+        paint: {
+          'text-color': INK,
+          'text-halo-color': P,
+          'text-halo-width': 2,
+        } },
+
+      // Road labels
+      { id: 'labels-roads', type: 'symbol', source: 'protomaps', 'source-layer': 'roads',
+        minzoom: 14,
+        filter: ['any',
+          ['==', ['get', 'pmap:kind'], 'major_road'],
+          ['==', ['get', 'pmap:kind'], 'medium_road'],
+        ],
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 10,
+          'symbol-placement': 'line',
+          'text-rotation-alignment': 'map',
+        },
+        paint: {
+          'text-color': SOFT,
+          'text-halo-color': P,
+          'text-halo-width': 1.5,
+          'text-opacity': 0.65,
+        } },
+
+      // Natural feature labels (parks, water)
+      { id: 'labels-natural', type: 'symbol', source: 'protomaps', 'source-layer': 'natural',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Italic'],
+          'text-size': 11,
+        },
+        paint: {
+          'text-color': MOSSD,
+          'text-halo-color': P,
+          'text-halo-width': 1.5,
+          'text-opacity': 0.7,
+        } },
+
+      // POI labels (minimal — just parks and schools at high zoom)
+      { id: 'labels-poi', type: 'symbol', source: 'protomaps', 'source-layer': 'pois',
+        minzoom: 15,
+        filter: ['any',
+          ['==', ['get', 'pmap:kind'], 'park'],
+          ['==', ['get', 'pmap:kind'], 'school'],
+          ['==', ['get', 'pmap:kind'], 'cemetery'],
+        ],
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Italic'],
+          'text-size': 10,
+        },
+        paint: {
+          'text-color': MOSSD,
+          'text-halo-color': P,
+          'text-halo-width': 1.5,
+          'text-opacity': 0.6,
+        } },
+    ]
   };
 }
 
