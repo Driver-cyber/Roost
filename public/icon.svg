@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#f4ede0"/>
+  <g transform="translate(256, 240)">
+    <!-- Simplified bird silhouette — a small perched songbird -->
+    <ellipse cx="0" cy="0" rx="48" ry="36" fill="#b85c2e" transform="rotate(-8)"/>
+    <!-- head -->
+    <circle cx="-38" cy="-28" r="22" fill="#b85c2e"/>
+    <!-- beak -->
+    <polygon points="-58,-32 -70,-28 -56,-26" fill="#d4a942"/>
+    <!-- eye -->
+    <circle cx="-42" cy="-32" r="3.5" fill="#2b2218"/>
+    <!-- tail -->
+    <polygon points="40,-8 72,-28 68,8" fill="#7a2e10"/>
+    <!-- wing line -->
+    <path d="M-10,-12 Q20,-20 44,-6" stroke="#7a2e10" stroke-width="3" fill="none"/>
+    <!-- legs -->
+    <line x1="-8" y1="32" x2="-14" y2="56" stroke="#6b5d4a" stroke-width="3" stroke-linecap="round"/>
+    <line x1="8" y1="32" x2="4" y2="56" stroke="#6b5d4a" stroke-width="3" stroke-linecap="round"/>
+    <!-- branch -->
+    <line x1="-60" y1="56" x2="60" y2="54" stroke="#6b5d4a" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <!-- App name -->
+  <text x="256" y="380" text-anchor="middle" font-family="Georgia, serif" font-style="italic"
+        font-size="64" font-weight="500" fill="#2b2218">Roost</text>
+</svg>
