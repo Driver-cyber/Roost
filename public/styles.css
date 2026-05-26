@@ -220,35 +220,10 @@ html, body {
 /* Sighting pins */
 .pin { cursor: pointer; }
 
-.pin-rust {
-  width: 12px; height: 12px;
-  background: var(--rust);
-  border: 2px solid var(--paper);
-  border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(43, 34, 24, 0.2);
-}
-
-.pin-gold {
-  width: 14px; height: 14px;
-  background: var(--gold);
-  border: 2px solid var(--paper);
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(212, 169, 66, 0.4);
-  animation: goldGlow 2s ease-in-out infinite;
-}
-
-@keyframes goldGlow {
-  0%, 100% { box-shadow: 0 0 8px rgba(212, 169, 66, 0.4); }
-  50% { box-shadow: 0 0 14px rgba(212, 169, 66, 0.6); }
-}
-
-.pin-moss {
-  width: 8px; height: 8px;
-  background: var(--moss);
-  border: 1.5px solid var(--paper);
-  border-radius: 50%;
-  opacity: 0.7;
-}
+/* Pin dot classes are now rendered as ::after pseudo-elements
+   on the .pin parent — see the "Map pin touch targets" section.
+   These empty rules preserved only for clarity; styles live on
+   .pin.pin-rust::after etc. */
 
 /* ================================================================
    BOTTOM SHEET — "Today on your block"
@@ -1227,19 +1202,55 @@ body.modal-open {
   touch-action: none;
 }
 
-/* Map pin touch targets — ensure minimum tappable area */
+/* Map pin touch targets — ensure minimum tappable area.
+   The .pin element gets both .pin and .pin-rust/.pin-gold/.pin-moss.
+   min-width/min-height override the small width/height from dot classes
+   so the tappable area stays at 44×44 while the dot draws small via
+   a centered pseudo-element. */
 .pin {
   min-width: 44px;
   min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Reset the small explicit sizes from dot classes — let min-* win */
+  width: auto;
+  height: auto;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 1;
+  position: relative;
 }
 
-.pin-rust,
-.pin-gold,
-.pin-moss {
-  pointer-events: none; /* Let parent .pin handle touch */
+/* Visual dot rendered as pseudo-element inside the 44×44 tap target */
+.pin::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+
+.pin.pin-rust::after {
+  width: 12px; height: 12px;
+  background: var(--rust);
+  border: 2px solid var(--paper);
+  box-shadow: 0 1px 4px rgba(43, 34, 24, 0.2);
+}
+
+.pin.pin-gold::after {
+  width: 14px; height: 14px;
+  background: var(--gold);
+  border: 2px solid var(--paper);
+  box-shadow: 0 0 8px rgba(212, 169, 66, 0.4);
+  animation: goldGlow 2s ease-in-out infinite;
+}
+
+.pin.pin-moss::after {
+  width: 8px; height: 8px;
+  background: var(--moss);
+  border: 1.5px solid var(--paper);
+  opacity: 0.7;
 }
 
 .sr-only {
