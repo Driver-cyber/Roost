@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initModal();
   initCSVImport();
+  initDrawer();
+  initBingo();
+  initTrophies();
   initMap();
   loadData();
 });
@@ -306,23 +309,27 @@ async function loadData() {
     // Offline — use whatever's in local state
   }
 
-  // Load eBird ambient data
+  // Load eBird ambient data with smart proximity matching
   try {
     const ebirdRes = await fetch(`${API}/ebird-nearby`);
     if (ebirdRes.ok) {
       const data = await ebirdRes.json();
-      const ebirdSightings = (data.observations || []).map(obs => ({
-        id: 'ebird-' + obs.species_code + '-' + obs.observed_at,
-        common_name: obs.common_name,
-        scientific_name: obs.scientific_name,
-        species_code: obs.species_code,
-        lat: obs.lat,
-        lon: obs.lon,
-        observed_at: obs.observed_at,
-        count: obs.count,
-        place_name: obs.location_name,
-        source: 'ebird',
-      }));
+      const ebirdSightings = (data.observations || []).map(obs => {
+        const distM = haversineM(HOME.lat, HOME.lon, obs.lat, obs.lon);
+        const isHome = distM < 150;
+        return {
+          id: 'ebird-' + obs.species_code + '-' + obs.observed_at,
+          common_name: obs.common_name,
+          scientific_name: obs.scientific_name,
+          species_code: obs.species_code,
+          lat: obs.lat,
+          lon: obs.lon,
+          observed_at: obs.observed_at,
+          count: obs.count,
+          place_name: isHome ? 'Your yard' : obs.location_name,
+          source: isHome ? 'home' : 'ebird',
+        };
+      });
       state.sightings = [...state.sightings, ...ebirdSightings];
     }
   } catch (_) {
@@ -449,9 +456,10 @@ function renderTodayFeed() {
 }
 
 function feedItemHTML(s) {
+  const isYours = s.source === 'home' || s.source === 'manual' || s.source === 'csv';
   const dotClass = s.source === 'ebird' ? 'moss' : isToday(s.observed_at) ? 'gold' : 'rust';
   const time = formatTime(s.observed_at);
-  const sourceLabel = s.source === 'ebird' ? 'nearby' : s.source === 'csv' ? 'eBird' : '';
+  const sourceLabel = s.source === 'ebird' ? 'nearby' : s.source === 'home' ? 'your yard' : s.source === 'csv' ? 'eBird' : '';
   const detail = [s.place_name, sourceLabel].filter(Boolean).join(' · ');
 
   return `
@@ -669,7 +677,8 @@ function renderMapPins() {
 
     const isRecent = isToday(s.observed_at);
     const pinClass = s.source === 'ebird' ? 'pin-moss' :
-                     isRecent ? 'pin-gold' : 'pin-rust';
+                     isRecent ? 'pin-gold' :
+                     (s.source === 'home' || s.source === 'manual' || s.source === 'csv') ? 'pin-rust' : 'pin-moss';
 
     const el = document.createElement('div');
     el.className = `pin ${pinClass}`;
@@ -691,6 +700,283 @@ function renderMapPins() {
 
     mapMarkers.push(marker);
   }
+}
+
+// ----------------------------------------------------------------
+// Settings Drawer
+// ----------------------------------------------------------------
+function initDrawer() {
+  const overlay = document.getElementById('drawer-overlay');
+  const btnOpen = document.getElementById('btn-settings');
+  const btnClose = document.getElementById('btn-drawer-close');
+  const btnImport = document.getElementById('btn-drawer-import');
+
+  btnOpen.addEventListener('click', () => overlay.classList.add('open'));
+  btnClose.addEventListener('click', () => overlay.classList.remove('open'));
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+
+  btnImport.addEventListener('click', () => {
+    overlay.classList.remove('open');
+    const addModal = document.getElementById('modal-add');
+    addModal.classList.add('open');
+    document.getElementById('form-sighting').style.display = 'none';
+    document.getElementById('csv-import-section').style.display = '';
+  });
+}
+
+// ----------------------------------------------------------------
+// Bingo
+// ----------------------------------------------------------------
+const BINGO_STORAGE_KEY = 'roost-bingo';
+const TROPHY_STORAGE_KEY = 'roost-trophies';
+
+const BINGO_TEMPLATES = [
+  { icon: '👀', task: (sp) => `Spot a ${sp}`, type: 'species' },
+  { icon: '🎵', task: () => 'Hear birdsong', type: 'general' },
+  { icon: '🌅', task: () => 'See a bird before 9am', type: 'time' },
+  { icon: '3️⃣', task: () => 'See 3 different species', type: 'count3' },
+  { icon: '🏠', task: () => 'Spot a bird from your yard', type: 'yard' },
+  { icon: '✈️', task: () => 'See a bird in flight', type: 'general' },
+  { icon: '🌳', task: () => 'Notice a bird in a tree', type: 'general' },
+  { icon: '💧', task: () => 'Spot a bird near water', type: 'general' },
+  { icon: '🪶', task: () => 'Find a feather', type: 'general' },
+  { icon: '📸', task: () => 'Take a bird photo', type: 'general' },
+  { icon: '2️⃣', task: () => 'See the same species twice', type: 'general' },
+  { icon: '🎨', task: (sp) => `Spot a ${sp}`, type: 'species' },
+  { icon: '🔭', task: (sp) => `Look for a ${sp}`, type: 'species' },
+  { icon: '🐦', task: () => 'Log any sighting', type: 'any' },
+  { icon: '☀️', task: () => 'Bird before noon', type: 'time' },
+  { icon: '🦅', task: () => 'See a raptor', type: 'general' },
+  { icon: '5️⃣', task: () => 'See 5 birds total', type: 'count5' },
+];
+
+function initBingo() {
+  document.getElementById('btn-bingo').addEventListener('click', () => {
+    document.getElementById('drawer-overlay').classList.remove('open');
+    openBingo();
+  });
+  document.getElementById('btn-bingo-close').addEventListener('click', () => {
+    document.getElementById('modal-bingo').classList.remove('open');
+  });
+  document.getElementById('modal-bingo').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-bingo') document.getElementById('modal-bingo').classList.remove('open');
+  });
+}
+
+function openBingo() {
+  const modal = document.getElementById('modal-bingo');
+  modal.classList.add('open');
+  renderBingo();
+}
+
+function getBingoSeed() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function seededRandom(seed) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) {
+    h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+  }
+  return function() {
+    h = (h * 1103515245 + 12345) & 0x7fffffff;
+    return (h % 1000) / 1000;
+  };
+}
+
+function generateBingoCard() {
+  const seed = getBingoSeed();
+  const rand = seededRandom(seed);
+
+  // Get nearby species for species-specific challenges
+  const nearbySpecies = [...new Set(
+    state.sightings.filter(s => s.source === 'ebird' || s.source === 'home')
+      .map(s => s.common_name)
+  )];
+
+  const shuffled = [...BINGO_TEMPLATES].sort(() => rand() - 0.5);
+  const cells = [];
+
+  for (let i = 0; i < 9 && i < shuffled.length; i++) {
+    const tmpl = shuffled[i];
+    let task;
+    if (tmpl.type === 'species' && nearbySpecies.length > 0) {
+      const sp = nearbySpecies[Math.floor(rand() * nearbySpecies.length)];
+      task = tmpl.task(sp);
+    } else if (tmpl.type === 'species') {
+      task = 'Spot any bird';
+    } else {
+      task = tmpl.task();
+    }
+    cells.push({ icon: tmpl.icon, task, type: tmpl.type, completed: false });
+  }
+
+  return { seed, cells };
+}
+
+function loadBingoState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(BINGO_STORAGE_KEY) || '{}');
+    if (saved.seed === getBingoSeed()) return saved;
+  } catch (_) {}
+  return null;
+}
+
+function saveBingoState(bingoState) {
+  localStorage.setItem(BINGO_STORAGE_KEY, JSON.stringify(bingoState));
+}
+
+function renderBingo() {
+  const grid = document.getElementById('bingo-grid');
+  const dateEl = document.getElementById('bingo-date');
+  const rewardEl = document.getElementById('bingo-reward');
+
+  let bingoState = loadBingoState();
+  if (!bingoState) {
+    bingoState = generateBingoCard();
+    saveBingoState(bingoState);
+  }
+
+  const today = new Date();
+  dateEl.textContent = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  // Auto-check based on today's sightings
+  autoCheckBingo(bingoState);
+
+  grid.innerHTML = bingoState.cells.map((cell, i) => `
+    <div class="bingo-cell ${cell.completed ? 'completed' : ''}" data-idx="${i}">
+      <div class="bingo-icon">${cell.icon}</div>
+      <div class="bingo-task">${cell.task}</div>
+    </div>
+  `).join('');
+
+  // Tap to manually complete
+  grid.querySelectorAll('.bingo-cell:not(.completed)').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.idx);
+      bingoState.cells[idx].completed = true;
+      saveBingoState(bingoState);
+      renderBingo();
+    });
+  });
+
+  // Check for completed rows or full card
+  const completedCount = bingoState.cells.filter(c => c.completed).length;
+  const hasRow = checkBingoRows(bingoState.cells);
+
+  if (completedCount === 9) {
+    rewardEl.innerHTML = `
+      <div class="reward-egg">🥚</div>
+      <div class="reward-text">Full card! You earned a Golden Egg!</div>
+    `;
+    awardTrophy('golden-egg', '🥚', 'Golden Egg', getBingoSeed());
+  } else if (hasRow) {
+    rewardEl.innerHTML = `
+      <div class="reward-egg">🪺</div>
+      <div class="reward-text">Bingo! Row complete!</div>
+    `;
+    awardTrophy('bingo-row', '🪺', 'Bingo Row', getBingoSeed());
+  } else {
+    rewardEl.innerHTML = `<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--ink-faint);">${completedCount}/9 — tap a square when you complete it</div>`;
+  }
+
+  // Update badge in drawer
+  const badge = document.getElementById('bingo-badge');
+  if (badge) badge.textContent = completedCount > 0 ? `${completedCount}/9` : '';
+}
+
+function autoCheckBingo(bingoState) {
+  const todaySightings = state.sightings.filter(s => isToday(s.observed_at));
+  const todaySpecies = [...new Set(todaySightings.map(s => s.common_name))];
+
+  for (const cell of bingoState.cells) {
+    if (cell.completed) continue;
+
+    if (cell.type === 'any' && todaySightings.length > 0) {
+      cell.completed = true;
+    } else if (cell.type === 'count3' && todaySpecies.length >= 3) {
+      cell.completed = true;
+    } else if (cell.type === 'count5' && todaySightings.length >= 5) {
+      cell.completed = true;
+    } else if (cell.type === 'yard' && todaySightings.some(s => s.source === 'home' || s.source === 'manual')) {
+      cell.completed = true;
+    } else if (cell.type === 'species') {
+      const target = cell.task.replace(/^(Spot a |Look for a )/, '').toLowerCase();
+      if (todaySpecies.some(sp => sp.toLowerCase() === target)) {
+        cell.completed = true;
+      }
+    }
+  }
+  saveBingoState(bingoState);
+}
+
+function checkBingoRows(cells) {
+  const rows = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  return rows.some(row => row.every(i => cells[i].completed));
+}
+
+// ----------------------------------------------------------------
+// Trophy Case
+// ----------------------------------------------------------------
+function initTrophies() {
+  document.getElementById('btn-trophies').addEventListener('click', () => {
+    document.getElementById('drawer-overlay').classList.remove('open');
+    openTrophies();
+  });
+  document.getElementById('btn-trophies-close').addEventListener('click', () => {
+    document.getElementById('modal-trophies').classList.remove('open');
+  });
+  document.getElementById('modal-trophies').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-trophies') document.getElementById('modal-trophies').classList.remove('open');
+  });
+}
+
+function openTrophies() {
+  document.getElementById('modal-trophies').classList.add('open');
+  renderTrophies();
+}
+
+function loadTrophies() {
+  try {
+    return JSON.parse(localStorage.getItem(TROPHY_STORAGE_KEY) || '[]');
+  } catch (_) { return []; }
+}
+
+function awardTrophy(type, icon, label, date) {
+  const trophies = loadTrophies();
+  if (trophies.some(t => t.type === type && t.date === date)) return;
+  trophies.push({ type, icon, label, date });
+  localStorage.setItem(TROPHY_STORAGE_KEY, JSON.stringify(trophies));
+
+  const countEl = document.getElementById('trophy-count');
+  if (countEl) countEl.textContent = trophies.length;
+
+  toast(`${icon} ${label} earned!`);
+}
+
+function renderTrophies() {
+  const grid = document.getElementById('trophy-grid');
+  const empty = document.getElementById('trophy-empty');
+  const trophies = loadTrophies();
+
+  const countEl = document.getElementById('trophy-count');
+  if (countEl) countEl.textContent = trophies.length || '';
+
+  if (trophies.length === 0) {
+    grid.innerHTML = '';
+    empty.textContent = 'Complete bingo challenges to earn trophies.';
+    return;
+  }
+
+  empty.textContent = '';
+  grid.innerHTML = trophies.map(t => `
+    <div class="trophy-item">
+      <div class="trophy-icon">${t.icon}</div>
+      <div class="trophy-label">${t.label}<br>${t.date}</div>
+    </div>
+  `).join('');
 }
 
 // ----------------------------------------------------------------
@@ -724,6 +1010,15 @@ function formatDateLabel(dateStr) {
     month: 'long',
     day: 'numeric',
   });
+}
+
+function haversineM(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function toast(message) {
