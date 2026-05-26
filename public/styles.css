@@ -86,11 +86,16 @@ html, body {
 .gear-btn {
   background: none;
   border: none;
-  padding: 12px 16px 12px 8px;
+  padding: 12px 16px 12px 12px;
   color: var(--ink-faint);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .gear-btn:active { color: var(--ink-soft); }
@@ -120,6 +125,7 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   min-height: 0;
 }
 
@@ -155,6 +161,7 @@ html, body {
   min-height: 260px;
   max-height: 400px;
   background: #e8e0d0;
+  touch-action: none; /* Let MapLibre handle all touch gestures */
 }
 
 .map-loading {
@@ -213,35 +220,10 @@ html, body {
 /* Sighting pins */
 .pin { cursor: pointer; }
 
-.pin-rust {
-  width: 12px; height: 12px;
-  background: var(--rust);
-  border: 2px solid var(--paper);
-  border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(43, 34, 24, 0.2);
-}
-
-.pin-gold {
-  width: 14px; height: 14px;
-  background: var(--gold);
-  border: 2px solid var(--paper);
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(212, 169, 66, 0.4);
-  animation: goldGlow 2s ease-in-out infinite;
-}
-
-@keyframes goldGlow {
-  0%, 100% { box-shadow: 0 0 8px rgba(212, 169, 66, 0.4); }
-  50% { box-shadow: 0 0 14px rgba(212, 169, 66, 0.6); }
-}
-
-.pin-moss {
-  width: 8px; height: 8px;
-  background: var(--moss);
-  border: 1.5px solid var(--paper);
-  border-radius: 50%;
-  opacity: 0.7;
-}
+/* Pin dot classes are now rendered as ::after pseudo-elements
+   on the .pin parent — see the "Map pin touch targets" section.
+   These empty rules preserved only for clarity; styles live on
+   .pin.pin-rust::after etc. */
 
 /* ================================================================
    BOTTOM SHEET — "Today on your block"
@@ -599,7 +581,9 @@ html, body {
   transform: translateY(100%);
   transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
   max-height: 85vh;
+  max-height: 85dvh; /* dynamic viewport height for iOS Safari */
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal-overlay.open .modal {
@@ -643,7 +627,7 @@ html, body {
   width: 100%;
   padding: 10px 14px;
   font-family: var(--font-ui);
-  font-size: 0.9rem;
+  font-size: 16px; /* Must be >= 16px to prevent iOS Safari auto-zoom on focus */
   color: var(--ink);
   background: var(--paper-warm);
   border: 1.5px solid #e0d8ca;
@@ -651,6 +635,7 @@ html, body {
   outline: none;
   transition: border-color 0.15s ease;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .form-group input:focus,
@@ -680,7 +665,8 @@ html, body {
 
 .btn-primary {
   width: 100%;
-  padding: 12px;
+  padding: 14px 12px;
+  min-height: 44px;
   font-family: var(--font-ui);
   font-size: 0.88rem;
   font-weight: 600;
@@ -700,7 +686,8 @@ html, body {
 
 .btn-secondary {
   width: 100%;
-  padding: 10px;
+  padding: 12px 10px;
+  min-height: 44px;
   font-family: var(--font-ui);
   font-size: 0.82rem;
   font-weight: 500;
@@ -829,8 +816,10 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
   padding: 10px 0 8px;
+  min-height: 48px;
   background: none;
   border: none;
   cursor: pointer;
@@ -867,7 +856,7 @@ html, body {
    ================================================================ */
 
 .toast {
-  position: absolute;
+  position: fixed;
   top: calc(12px + var(--safe-top));
   left: 50%;
   transform: translateX(-50%) translateY(-120%);
@@ -880,6 +869,8 @@ html, body {
   z-index: 300;
   transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   white-space: nowrap;
+  max-width: calc(100vw - 40px);
+  text-align: center;
 }
 
 .toast.show {
@@ -918,7 +909,10 @@ html, body {
   display: flex;
   flex-direction: column;
   padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .drawer-overlay.open .drawer {
@@ -946,7 +940,12 @@ html, body {
   border: none;
   color: var(--ink-soft);
   cursor: pointer;
-  padding: 4px;
+  padding: 12px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -992,7 +991,8 @@ html, body {
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 0;
+  padding: 14px 0;
+  min-height: 48px;
   background: none;
   border: none;
   border-bottom: 1px solid #ece5d6;
@@ -1182,6 +1182,76 @@ html, body {
 /* ================================================================
    UTILITIES
    ================================================================ */
+
+/* Focus-visible styles for keyboard accessibility */
+.gear-btn:focus-visible,
+.drawer-close:focus-visible,
+.tab:focus-visible,
+.fab:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.drawer-item:focus-visible,
+.bingo-cell:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 2px;
+}
+
+/* Body scroll lock when modals/drawers are open */
+body.modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* Map pin touch targets — ensure minimum tappable area.
+   The .pin element gets both .pin and .pin-rust/.pin-gold/.pin-moss.
+   min-width/min-height override the small width/height from dot classes
+   so the tappable area stays at 44×44 while the dot draws small via
+   a centered pseudo-element. */
+.pin {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Reset the small explicit sizes from dot classes — let min-* win */
+  width: auto;
+  height: auto;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 1;
+  position: relative;
+}
+
+/* Visual dot rendered as pseudo-element inside the 44×44 tap target */
+.pin::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+
+.pin.pin-rust::after {
+  width: 12px; height: 12px;
+  background: var(--rust);
+  border: 2px solid var(--paper);
+  box-shadow: 0 1px 4px rgba(43, 34, 24, 0.2);
+}
+
+.pin.pin-gold::after {
+  width: 14px; height: 14px;
+  background: var(--gold);
+  border: 2px solid var(--paper);
+  box-shadow: 0 0 8px rgba(212, 169, 66, 0.4);
+  animation: goldGlow 2s ease-in-out infinite;
+}
+
+.pin.pin-moss::after {
+  width: 8px; height: 8px;
+  background: var(--moss);
+  border: 1.5px solid var(--paper);
+  opacity: 0.7;
+}
 
 .sr-only {
   position: absolute;
