@@ -306,6 +306,29 @@ async function loadData() {
     // Offline — use whatever's in local state
   }
 
+  // Load eBird ambient data
+  try {
+    const ebirdRes = await fetch(`${API}/ebird-nearby`);
+    if (ebirdRes.ok) {
+      const data = await ebirdRes.json();
+      const ebirdSightings = (data.observations || []).map(obs => ({
+        id: 'ebird-' + obs.species_code + '-' + obs.observed_at,
+        common_name: obs.common_name,
+        scientific_name: obs.scientific_name,
+        species_code: obs.species_code,
+        lat: obs.lat,
+        lon: obs.lon,
+        observed_at: obs.observed_at,
+        count: obs.count,
+        place_name: obs.location_name,
+        source: 'ebird',
+      }));
+      state.sightings = [...state.sightings, ...ebirdSightings];
+    }
+  } catch (_) {
+    // eBird unavailable — app works fine without it
+  }
+
   rebuildSpeciesFromSightings();
   renderAll();
 }
