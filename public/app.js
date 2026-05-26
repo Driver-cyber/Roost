@@ -391,15 +391,19 @@ function renderAll() {
 // ----------------------------------------------------------------
 // Voice Line
 // ----------------------------------------------------------------
+function aAn(name) {
+  return /^[aeiou]/i.test(name) ? 'an' : 'a';
+}
+
 const voiceTemplates = [
-  (s) => `A ${s.common_name.toLowerCase()} was spotted nearby this morning.`,
+  (s) => { const n = s.common_name.toLowerCase(); return `${aAn(n).replace(/^./, c => c.toUpperCase())} ${n} was spotted nearby this morning.`; },
   (s) => `${s.common_name} — visiting the neighborhood again.`,
-  (s) => `Someone saw a ${s.common_name.toLowerCase()} not far from here.`,
+  (s) => { const n = s.common_name.toLowerCase(); return `Someone saw ${aAn(n)} ${n} not far from here.`; },
   (s) => `The ${s.common_name.toLowerCase()} is back.`,
-  (s) => `A quiet morning. A ${s.common_name.toLowerCase()} stopped by.`,
+  (s) => { const n = s.common_name.toLowerCase(); return `A quiet morning. ${aAn(n).replace(/^./, c => c.toUpperCase())} ${n} stopped by.`; },
   (s) => `This morning's visitor: ${s.common_name.toLowerCase()}.`,
-  (s) => `A ${s.common_name.toLowerCase()} passed through your corner of the world.`,
-  (s) => `The neighborhood heard from a ${s.common_name.toLowerCase()} today.`,
+  (s) => { const n = s.common_name.toLowerCase(); return `${aAn(n).replace(/^./, c => c.toUpperCase())} ${n} passed through your corner of the world.`; },
+  (s) => { const n = s.common_name.toLowerCase(); return `The neighborhood heard from ${aAn(n)} ${n} today.`; },
 ];
 
 const fallbackVoiceLines = [
@@ -422,7 +426,8 @@ function renderVoiceLine() {
     const latest = state.sightings[0];
     const daysAgo = Math.floor((Date.now() - new Date(latest.observed_at)) / 86400000);
     if (daysAgo <= 3) {
-      el.textContent = `Last seen: a ${latest.common_name.toLowerCase()}, ${daysAgo === 0 ? 'earlier today' : daysAgo === 1 ? 'yesterday' : daysAgo + ' days ago'}.`;
+      const n = latest.common_name.toLowerCase();
+      el.textContent = `Last seen: ${aAn(n)} ${n}, ${daysAgo === 0 ? 'earlier today' : daysAgo === 1 ? 'yesterday' : daysAgo + ' days ago'}.`;
     } else {
       el.textContent = fallbackVoiceLines[Math.floor(Math.random() * fallbackVoiceLines.length)];
     }
