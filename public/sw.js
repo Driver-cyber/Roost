@@ -1,8 +1,10 @@
 const CACHE_NAME = 'roost-v1';
 const STATIC_ASSETS = [
   '/',
+  '/styles.css',
+  '/app.js',
   '/manifest.json',
-  '/icon.svg'
+  '/icon.svg',
 ];
 
 self.addEventListener('install', event => {
@@ -40,10 +42,12 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(request).then(cached => {
       const fetched = fetch(request).then(response => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+        }
         return response;
-      });
+      }).catch(() => cached);
       return cached || fetched;
     })
   );
