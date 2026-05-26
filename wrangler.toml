@@ -1,0 +1,11 @@
+name = "roost"
+compatibility_date = "2024-12-01"
+
+# Pages project — static assets served from root,
+# Functions from functions/ directory (auto-detected).
+
+# D1 database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "roost-db"
+database_id = "d5f42158-e726-476e-afc1-3833d51cad93"

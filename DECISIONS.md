@@ -27,11 +27,11 @@ working v1, then iterate with her on v2.
 - **Frontend:** Vanilla HTML/CSS/JS, single-file shape preferred. React
   via Babel CDN only if state complexity demands it. PWA installable.
 - **Fonts:** Fraunces + Plus Jakarta Sans + DM Mono (Google Fonts CDN)
-- **Backend / DB:** Supabase (PostgreSQL)
+- **Backend / DB:** Cloudflare D1 (SQLite) + Pages Functions (API layer)
 - **Map tiles:** Protomaps PMTiles + MapLibre GL JS + Cloudflare R2 hosting
 - **External API:** eBird API 2.0 (public observations only)
 - **Data ingest:** eBird “Download My Data” CSV upload
-- **Hosting:** Cloudflare Pages
+- **Hosting:** Cloudflare Pages (app + API) + D1 (database) + R2 (tiles)
 - **Repo:** `Driver-cyber/roost` (public, GitHub)
 
 -----
@@ -86,6 +86,28 @@ working v1, then iterate with her on v2.
     specific-street fragility of “Maplewood” and the
     real-notebook-brand collision of “Field Notes.”
 
+### 2026-05-26 — Backend pivot: Supabase → Cloudflare D1
+
+- **Decision:** Replace Supabase with Cloudflare D1 + Pages Functions.
+- **Why:** Chad has used all Supabase free-tier accounts. D1 is free,
+  lives in the same Cloudflare ecosystem as Pages and R2 (one dashboard,
+  one account), and SQLite covers Roost’s relational needs without the
+  overhead of hosted Postgres.
+- **What changes:**
+  - Backend is now D1 (SQLite at the edge) instead of Supabase (Postgres).
+  - API layer is Cloudflare Pages Functions (`functions/` directory in the
+    repo) instead of Supabase client SDK.
+  - Auth simplifies: no Supabase Auth. Single-user bearer token for v1.
+  - Migrations are `.sql` files applied via `wrangler d1 execute`.
+  - Local dev uses `npx wrangler pages dev` with local D1 binding.
+- **What doesn’t change:** Data model (sightings, species, places, notes),
+  eBird integration, map renderer, frontend approach, deploy target.
+- **Tradeoff accepted:** D1 is newer/less battle-tested than Supabase, and
+  SQLite has fewer features than Postgres. Neither matters at Roost’s
+  scale. The wins (zero cost, unified dashboard, simpler deploy) outweigh.
+- **Cadence implication:** The Supabase open questions from Cadence no
+  longer apply to Roost. The two projects now use different backends.
+
 ### Build Tracker
 
 - **Status:** Not yet created. Add `roost-tracker.html` per the
@@ -94,7 +116,7 @@ working v1, then iterate with her on v2.
   itself — the tracker’s aesthetic is separate from Roost’s in-app
   aesthetic.
 - **Initial priorities** for the tracker when made:
-1. Supabase schema + project setup
+1. D1 schema + Pages Functions API setup
 1. PMTiles extract + R2 hosting + MapLibre custom style
 1. Sighting logger (manual entry) — first working feature
 
@@ -105,10 +127,10 @@ working v1, then iterate with her on v2.
 These need answers before or during early build. Don’t proceed past the
 relevant module without resolving.
 
-- **[KEYS]** How are Supabase keys injected? Same question as Cadence —
-  resolve in one place, apply to both. Don’t paste keys into source.
-- **[SESSION]** What defines “session continuity” in Supabase? Carried over
-  from Cadence — same answer should work for both.
+- ~~**[KEYS]** Supabase key injection~~ — **Resolved.** Pivoted to D1.
+  No client-side keys needed; D1 is bound server-side via wrangler.toml.
+- ~~**[SESSION]** Supabase session continuity~~ — **Resolved.** No longer
+  applies. Auth is a simple bearer token in Pages secrets.
 - **[BOUNDS]** What’s the geographic extent of the PMTiles extract? Default
   proposal: a ~3–5 mile radius around home, generous enough to cover
   Maplewood + nearby parks + likely walking destinations. Confirm before
@@ -154,17 +176,18 @@ will be revisited, some will be killed.
 
 ## 🚧 Current State
 
-- **Where we are:** Founding documents complete. Mockups produced. No
-  code written.
+- **Where we are:** Founding documents complete. Mockups produced. Backend
+  pivoted from Supabase to Cloudflare D1 (2026-05-26). Repo exists on
+  GitHub. No app code written yet.
 - **What’s next:**
-1. Resolve Cadence’s open Supabase questions (or commit to a deliberate
-   approach here, applying to both projects)
+1. Create D1 database in Cloudflare dashboard
+1. Build Module 1: D1 schema + Pages Functions API + wrangler.toml
+1. Build PWA app shell (index.html, manifest, service worker, design system)
 1. Request eBird API key
-1. Set up `Driver-cyber/roost` repo + Cloudflare Pages connection
+1. Set up Cloudflare Pages connection to the repo
 1. Create `roost-tracker.html` per the build-tracker pattern
-1. Begin Module 1 (Supabase schema)
 
 -----
 
-*Last updated: 2026-05-25. Update this file at the end of any session that
+*Last updated: 2026-05-26. Update this file at the end of any session that
 changes priorities or makes a decision.*
