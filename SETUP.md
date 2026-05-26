@@ -18,7 +18,7 @@
 |Heavy code lifts   |Claude Code in Cowork          |Desktop, async — hand it tasks|
 |Code review / merge|GitHub iOS app                 |Phone                         |
 |Deploy             |Cloudflare Pages (auto on push)|Web dashboard / iOS app       |
-|Database           |Supabase                       |Web dashboard / iOS app       |
+|Database           |Cloudflare D1                  |Cloudflare dashboard          |
 |Tile storage       |Cloudflare R2                  |Web dashboard, drag and drop  |
 |Live testing       |Cloudflare preview URLs        |Open on your phone            |
 |Planning / design  |Claude (chat app)              |Phone or browser              |
@@ -54,19 +54,18 @@ waiting for things to provision. After this, you’re in async/mobile flow.
 - [ ] Custom domain (later): `roost.chadstewartcpa.com` or similar via
   Cloudflare DNS.
 
-### 3. Supabase
+### 3. Cloudflare D1
 
-- [ ] Create new project. Pick a region close to home.
-- [ ] Copy the project URL and `anon` public key. These go into
-  Cloudflare Pages environment variables, **not** into source.
-- [ ] In Cloudflare Pages → Settings → Environment variables, add:
-  - `SUPABASE_URL`
-  - `SUPABASE_ANON_KEY`
-- [ ] **This is the moment to resolve the Cadence open question** about
-  key injection. Whatever pattern you land on, apply it here too.
-  Document the resolution in both projects’ DECISIONS.md.
-- [ ] Schema work is deferred to Module 1 of the build — don’t try to
-  design tables in setup. Just stand the project up.
+- [ ] Cloudflare dashboard → Workers & Pages → D1 → Create database.
+- [ ] Name it `roost-db`.
+- [ ] Copy the database ID. It goes into `wrangler.toml` in the repo
+  (not a secret — it’s a binding identifier, not a credential).
+- [ ] Schema work happens in Module 1 of the build. Migrations live in
+  `db/migrations/` and are applied via `wrangler d1 execute roost-db
+  --file=db/migrations/001_initial_schema.sql`.
+- [ ] No client-side keys needed. D1 is accessed server-side through
+  Pages Functions bindings. Auth is a bearer token stored in Pages
+  secrets.
 
 ### 4. eBird API key
 
@@ -156,12 +155,11 @@ Once setup is done, this is the loop:
 
 ### For database work
 
-- **Supabase web SQL editor** for schema changes, manual inspection,
-  one-off queries.
-- **Supabase iOS app** for monitoring usage, checking logs, viewing
-  tables on the go.
-- **Migrations:** save as `.sql` files in the repo under `db/migrations/`
-  so they’re version-controlled. Apply via SQL editor.
+- **Cloudflare dashboard → D1** for inspecting tables, running one-off
+  queries, and monitoring usage.
+- **Migrations:** saved as `.sql` files in the repo under `db/migrations/`,
+  version-controlled. Apply via `wrangler d1 execute roost-db --file=<path>`
+  or paste into the D1 console in the dashboard.
 
 ### For map style work
 
@@ -197,19 +195,19 @@ you in week three if you didn’t know going in.
 
 ## 🔐 Secrets & Environment Variables
 
-**Never commit secrets to the repo.** Everything sensitive lives in
-Cloudflare Pages env vars:
+**Never commit secrets to the repo.** Sensitive values live in Cloudflare
+Pages secrets. Non-secret config lives in `wrangler.toml` or Pages env vars.
 
-- `SUPABASE_URL` — public, but kept in env for cleanliness
-- `SUPABASE_ANON_KEY` — public (it’s the anon key; row-level security
-  is what protects data), but kept in env
-- `EBIRD_API_KEY` — keep in env
+- `AUTH_TOKEN` — **secret.** Bearer token for API auth. Set in Pages secrets.
+- `EBIRD_API_KEY` — **secret.** Set in Pages secrets.
 - `PMTILES_URL` — public, but env’d for environment swapping
 - `HOME_LAT` / `HOME_LON` — Joelle’s home coordinates for the anchor
   pin. Not secret but environment-specific.
+- D1 database binding is configured in `wrangler.toml` — no keys needed.
 
-For local development if you ever want it: a `.env.example` file in the
-repo with empty values, and a `.env` file (gitignored) with real values.
+For local development: a `.env.example` file in the repo with empty
+values, and a `.env` file (gitignored) with real values. `wrangler pages
+dev` picks up the D1 binding from `wrangler.toml` automatically.
 
 -----
 
@@ -245,7 +243,8 @@ Save these. You’ll come back to them.
 - **Protomaps web extractor:** <https://maps.protomaps.com/>
 - **MapLibre GL JS docs:** <https://maplibre.org/maplibre-gl-js/docs/>
 - **MapLibre style spec:** <https://maplibre.org/maplibre-style-spec/>
-- **Supabase JS client:** <https://supabase.com/docs/reference/javascript/>
+- **Cloudflare D1 docs:** <https://developers.cloudflare.com/d1/>
+- **Cloudflare Pages Functions:** <https://developers.cloudflare.com/pages/functions/>
 - **Cloudflare Pages docs:** <https://developers.cloudflare.com/pages/>
 - **PWA on iOS quirks:** <https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/>
 

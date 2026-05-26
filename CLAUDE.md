@@ -87,13 +87,16 @@ together.
 
 ### Backend
 
-- **Supabase (PostgreSQL).** Matches Cadence’s stack. Sightings, places,
-  notes, and synced eBird data live in relational tables. Auth is
-  single-user (Joelle) with Chad as a second account if/when sharing
-  matters.
-- **NOTE:** Two open Supabase questions exist in Cadence (key injection,
-  session continuity). Resolve those in Cadence first, or make the same
-  decisions deliberately here. Do not relitigate per-project.
+- **Cloudflare D1 (SQLite at the edge).** Single-file relational database,
+  free tier covers Roost many times over (5M reads/day, 100K writes/day).
+  Lives in the same Cloudflare ecosystem as Pages and R2 — one dashboard,
+  one account, one deploy pipeline.
+- **Cloudflare Pages Functions** serve as the thin API layer between the
+  PWA and D1. They live in the `functions/` directory of this repo and
+  deploy automatically with the rest of the app. No separate Worker
+  project needed.
+- **Auth:** Single-user for v1. Simple bearer token stored as a Cloudflare
+  Pages secret. Revisit if/when multi-user matters.
 
 ### Map rendering
 
@@ -122,8 +125,10 @@ together.
 
 ### Hosting & deploy
 
-- **Cloudflare Pages** for the app.
+- **Cloudflare Pages** for the app + API (Pages Functions).
+- **Cloudflare D1** for the database.
 - **Cloudflare R2** for the PMTiles file.
+- All Cloudflare. One dashboard, one account.
 - GitHub repo under `Driver-cyber`, public by default.
 
 -----
@@ -202,7 +207,7 @@ Status: 🔜 = planned, 🚧 = in progress, ✅ = complete.
 
 |# |Module                 |Status|What it does                                                         |
 |--|-----------------------|------|---------------------------------------------------------------------|
-|1 |Supabase schema        |🔜     |Sightings, species, places, notes tables. Migrations versioned.      |
+|1 |D1 schema + API        |🔜     |D1 database, Pages Functions API, migrations versioned.              |
 |2 |Map renderer           |🔜     |PMTiles extract for neighborhood, R2 hosting, MapLibre + custom style|
 |3 |Sighting logger        |🔜     |“Add a sighting” form — species, place, time, note, optional photo   |
 |4 |eBird public API client|🔜     |Recent nearby observations, refresh on app open, sensible cache      |
@@ -269,10 +274,11 @@ Every session, in order:
 
 ## 🛠 Build & Run
 
-- **Local dev:** `[to be set on first build — likely `npx wrangler pages
-  dev`]`
+- **Local dev:** `npx wrangler pages dev` (serves static files + Functions
+  + D1 local binding)
 - **Deploy:** Push to `main` on the GitHub repo → Cloudflare Pages auto-builds
-- **Supabase:** Project keys live in `[TBD — resolve with Cadence's key-injection question]`
+- **D1:** Database bound to Pages project via `wrangler.toml`. Migrations
+  in `db/migrations/`, applied via `wrangler d1 execute`.
 - **R2 / PMTiles:** PMTiles file hosted at `[TBD URL on R2]`; MapLibre
   loads via `pmtiles://` protocol
 
