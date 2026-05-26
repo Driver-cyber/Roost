@@ -878,7 +878,7 @@ html, body {
   position: fixed;
   top: 12px;
   left: 50%;
-  transform: translateX(-50%) translateY(-120%);
+  transform: translateX(-50%) translateY(-200%);
   background: var(--ink);
   color: var(--paper);
   font-family: var(--font-ui);
@@ -890,10 +890,12 @@ html, body {
   white-space: nowrap;
   max-width: calc(100vw - 40px);
   text-align: center;
-  pointer-events: none; /* Don't block taps on content behind toast */
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .toast.show {
+  visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
 
