@@ -72,7 +72,7 @@ html, body {
 .app-header {
   display: flex;
   align-items: flex-start;
-  padding-top: calc(var(--safe-top) + 8px);
+  padding-top: max(calc(var(--safe-top) + 12px), 54px);
   background: var(--paper);
   flex-shrink: 0;
   z-index: 10;
@@ -82,7 +82,7 @@ html, body {
 @supports (padding-top: env(safe-area-inset-top)) {
   @media all and (display-mode: standalone) {
     .app-header {
-      padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+      padding-top: max(calc(env(safe-area-inset-top, 0px) + 12px), 54px);
     }
   }
 }
@@ -883,7 +883,7 @@ html, body {
 
 .toast {
   position: fixed;
-  top: calc(12px + var(--safe-top));
+  top: max(calc(12px + var(--safe-top)), 56px);
   left: 50%;
   transform: translateX(-50%) translateY(-120%);
   background: var(--ink);
