@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Roost — A Tour</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --paper: #f4ede0;
+  --paper-warm: #fef6e3;
+  --ink: #2b2218;
+  --ink-soft: #6b5d4a;
+  --ink-faint: #9e917e;
+  --moss: #4a6b3a;
+  --moss-deep: #2f4624;
+  --rust: #b85c2e;
+  --rust-deep: #7a2e10;
+  --gold: #d4a942;
+  --sky: #7da7c4;
+  --font-voice: 'Fraunces', Georgia, serif;
+  --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   SCROLLYTELLING STRUCTURE
+   ============================================================ */
+
+.scene {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================================
+   SCENE 1 — HERO / TITLE
+   ============================================================ */
+
+.scene-hero {
+  background: linear-gradient(170deg, var(--paper-warm) 0%, var(--paper) 50%, #e8e0d0 100%);
+}
+
+.hero-bird {
+  width: 120px;
+  height: 120px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s 0.3s ease forwards;
+}
+
+.hero-title {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(2.4rem, 8vw, 3.6rem);
+  color: var(--ink);
+  margin-top: 20px;
+  opacity: 0;
+  animation: fadeUp 1s 0.6s ease forwards;
+}
+
+.hero-subtitle {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(0.95rem, 3vw, 1.15rem);
+  color: var(--ink-soft);
+  margin-top: 12px;
+  text-align: center;
+  max-width: 320px;
+  line-height: 1.5;
+  opacity: 0;
+  animation: fadeUp 1s 0.9s ease forwards;
+}
+
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeUp 1s 1.5s ease forwards, pulse 2s 2.5s ease-in-out infinite;
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ============================================================
+   SCENE 2 — THE FEELING (NORTH STAR)
+   ============================================================ */
+
+.scene-feeling {
+  background: var(--paper);
+}
+
+.feeling-quote {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 4vw, 1.5rem);
+  color: var(--ink);
+  text-align: center;
+  max-width: 340px;
+  line-height: 1.65;
+}
+
+.feeling-dash {
+  width: 40px;
+  height: 2px;
+  background: var(--rust);
+  margin: 24px 0;
+  border-radius: 1px;
+}
+
+.feeling-detail {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-align: center;
+  max-width: 300px;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   SCENE 3 — THE MAP (PINNED PHONE MOCKUP)
+   ============================================================ */
+
+.scene-map {
+  background: linear-gradient(180deg, var(--paper) 0%, #e4dccf 100%);
+  padding: 40px 20px;
+}
+
+.phone-frame {
+  width: 280px;
+  max-width: 80vw;
+  background: var(--paper-warm);
+  border-radius: 28px;
+  border: 2px solid #d8cfc0;
+  box-shadow: 0 20px 60px rgba(43, 34, 24, 0.12);
+  overflow: hidden;
+  position: sticky;
+  top: 10vh;
+}
+
+.phone-status-bar {
+  height: 32px;
+  background: var(--paper-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-status-bar span {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--ink-faint);
+}
+
+.phone-voice-line {
+  padding: 8px 20px 10px;
+  text-align: center;
+}
+
+.phone-voice-line p {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+.phone-map-area {
+  height: 200px;
+  background: #e8e2d4;
+  position: relative;
+  overflow: hidden;
+}
+
+.map-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+  background-image:
+    linear-gradient(var(--ink-faint) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ink-faint) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.map-roads {
+  position: absolute;
+  inset: 0;
+}
+
+.map-roads svg { width: 100%; height: 100%; }
+
+.pin {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.pin-rust { background: var(--rust); }
+.pin-gold { background: var(--gold); animation: pinPulse 2s ease-in-out infinite; }
+.pin-moss { background: var(--moss); width: 8px; height: 8px; opacity: 0.7; }
+
+.home-outline {
+  position: absolute;
+  width: 48px;
+  height: 40px;
+  border: 2px dashed var(--rust);
+  border-radius: 4px;
+  opacity: 0.5;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes pinPulse {
+  0%, 100% { box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  50% { box-shadow: 0 1px 4px rgba(0,0,0,0.2), 0 0 0 6px rgba(212, 169, 66, 0.2); }
+}
+
+.phone-feed-peek {
+  padding: 12px 16px;
+  background: var(--paper-warm);
+  border-top: 1px solid #e0d8ca;
+}
+
+.feed-peek-title {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.feed-peek-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.feed-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.feed-dot.rust { background: var(--rust); }
+.feed-dot.gold { background: var(--gold); }
+.feed-dot.moss { background: var(--moss); }
+
+.feed-name {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--ink);
+  flex: 1;
+}
+
+.feed-time {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--ink-faint);
+}
+
+.phone-tabs {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 12px;
+  border-top: 1px solid #e0d8ca;
+}
+
+.phone-tab {
+  font-family: var(--font-ui);
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+.phone-tab.active { color: var(--rust); }
+
+.map-caption {
+  margin-top: 32px;
+  text-align: center;
+  max-width: 300px;
+}
+
+.map-caption h3 {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.3rem;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.map-caption p {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+/* ============================================================
+   SCENE 4 — PIN LEGEND
+   ============================================================ */
+
+.scene-pins {
+  background: var(--paper);
+  gap: 40px;
+}
+
+.pin-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 320px;
+}
+
+.pin-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.pin-sample {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.pin-sample.rust { background: var(--rust); }
+.pin-sample.gold { background: var(--gold); }
+.pin-sample.moss { background: var(--moss); width: 18px; height: 18px; margin-top: 5px; }
+
+.pin-explain h4 {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.pin-explain p {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   SCENE 5 — VOICE LINE EXAMPLES
+   ============================================================ */
+
+.scene-voice {
+  background: linear-gradient(180deg, #e4dccf 0%, var(--paper) 30%, var(--paper) 70%, #e4dccf 100%);
+}
+
+.voice-carousel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.voice-example {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1rem, 3.5vw, 1.2rem);
+  color: var(--ink);
+  text-align: center;
+  max-width: 320px;
+  line-height: 1.5;
+  padding: 16px 24px;
+  background: var(--paper-warm);
+  border-radius: 12px;
+  border-left: 3px solid var(--rust);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.6s ease;
+}
+
+.voice-example.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.voice-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ============================================================
+   SCENE 6 — JOURNAL
+   ============================================================ */
+
+.scene-journal {
+  background: var(--paper);
+}
+
+.journal-mockup {
+  width: 280px;
+  max-width: 80vw;
+  background: var(--paper-warm);
+  border-radius: 16px;
+  border: 1px solid #e0d8ca;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(43, 34, 24, 0.08);
+}
+
+.journal-day-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ece5d6;
+}
+
+.journal-entry {
+  padding: 10px 0;
+  border-bottom: 1px solid #ece5d6;
+}
+
+.journal-entry:last-child { border-bottom: none; }
+
+.journal-entry .j-species {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.journal-entry .j-meta {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+.journal-entry .j-note {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.journal-caption {
+  margin-top: 28px;
+  text-align: center;
+  max-width: 300px;
+}
+
+.journal-caption h3 {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.3rem;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.journal-caption p {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+/* ============================================================
+   SCENE 7 — THE DECK (COLLECTION)
+   ============================================================ */
+
+.scene-deck {
+  background: linear-gradient(180deg, var(--paper) 0%, #e4dccf 100%);
+}
+
+.deck-mockup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 280px;
+  max-width: 80vw;
+}
+
+.deck-card {
+  aspect-ratio: 0.78;
+  background: var(--paper-warm);
+  border-radius: 10px;
+  border: 1px solid #e0d8ca;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(43, 34, 24, 0.06);
+}
+
+.deck-card.unlocked {
+  border-color: var(--rust);
+  border-width: 1.5px;
+}
+
+.deck-card .card-icon {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+.deck-card .card-name {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: 0.6rem;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.deck-card .card-count {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+.deck-card.locked {
+  opacity: 0.35;
+}
+
+.deck-card.locked .card-icon {
+  filter: grayscale(1);
+}
+
+.deck-caption {
+  margin-top: 28px;
+  text-align: center;
+  max-width: 300px;
+}
+
+.deck-caption h3 {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.3rem;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.deck-caption p {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+/* ============================================================
+   SCENE 8 — HOW IT WORKS
+   ============================================================ */
+
+.scene-flow {
+  background: var(--paper);
+}
+
+.flow-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 320px;
+}
+
+.flow-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px 0;
+}
+
+.flow-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--rust);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.flow-connector {
+  width: 2px;
+  height: 16px;
+  background: #d8cfc0;
+  margin-left: 15px;
+}
+
+.flow-text h4 {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+
+.flow-text p {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.flow-caption {
+  margin-top: 28px;
+  text-align: center;
+}
+
+.flow-caption h3 {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.3rem;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+/* ============================================================
+   SCENE 9 — CLOSER
+   ============================================================ */
+
+.scene-close {
+  background: linear-gradient(180deg, #e4dccf 0%, var(--paper) 40%, var(--paper-warm) 100%);
+}
+
+.close-text {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+  color: var(--ink);
+  text-align: center;
+  max-width: 320px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.close-cta {
+  display: inline-block;
+  padding: 14px 32px;
+  background: var(--rust);
+  color: var(--paper);
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 24px;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(184, 92, 46, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.close-cta:active { transform: scale(0.97); }
+
+.close-byline {
+  margin-top: 32px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   SCROLL-DRIVEN REVEALS
+   ============================================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.15s; }
+.reveal-delay-2 { transition-delay: 0.3s; }
+.reveal-delay-3 { transition-delay: 0.45s; }
+
+/* ============================================================
+   PARALLAX LAYERS
+   ============================================================ */
+
+.parallax-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.parallax-bg .leaf {
+  position: absolute;
+  font-size: 1.5rem;
+  opacity: 0.08;
+}
+
+.scene > *:not(.parallax-bg):not(.hero-scroll-hint) {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================ SCENE 1: HERO ================ -->
+<section class="scene scene-hero">
+  <div class="parallax-bg">
+    <span class="leaf" style="top:12%;left:8%">🍂</span>
+    <span class="leaf" style="top:25%;right:12%;font-size:2rem">🍃</span>
+    <span class="leaf" style="bottom:20%;left:15%">🪶</span>
+    <span class="leaf" style="bottom:30%;right:8%;font-size:1.2rem">🌿</span>
+  </div>
+  <img src="/icon.svg" alt="Roost" class="hero-bird">
+  <h1 class="hero-title">Roost</h1>
+  <p class="hero-subtitle">Your neighborhood, drawn in birdsong.</p>
+  <div class="hero-scroll-hint">scroll to explore</div>
+</section>
+
+<!-- ================ SCENE 2: THE FEELING ================ -->
+<section class="scene scene-feeling">
+  <p class="feeling-quote reveal">Open the app on a Tuesday morning. See one sentence about a bird that visited the yard. See the neighborhood drawn. Close the app within thirty seconds knowing the day has already had something good in it.</p>
+  <div class="feeling-dash reveal reveal-delay-1"></div>
+  <p class="feeling-detail reveal reveal-delay-2">That feeling is the product. Everything else is in service of it.</p>
+</section>
+
+<!-- ================ SCENE 3: THE MAP ================ -->
+<section class="scene scene-map">
+  <div class="phone-frame reveal">
+    <div class="phone-status-bar"><span>9:41 AM</span></div>
+    <div class="phone-voice-line">
+      <p>A cardinal visited your maple this morning.</p>
+    </div>
+    <div class="phone-map-area">
+      <div class="map-grid"></div>
+      <div class="map-roads">
+        <svg viewBox="0 0 280 200" fill="none">
+          <path d="M0 90 L280 85" stroke="#c8bfab" stroke-width="3"/>
+          <path d="M0 130 L280 140" stroke="#c8bfab" stroke-width="2"/>
+          <path d="M140 0 L135 200" stroke="#c8bfab" stroke-width="3"/>
+          <path d="M80 0 L85 200" stroke="#c8bfab" stroke-width="1.5"/>
+          <path d="M200 0 L195 200" stroke="#c8bfab" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="home-outline"></div>
+      <!-- Pins -->
+      <div class="pin pin-gold" style="top:46%;left:48%"></div>
+      <div class="pin pin-rust" style="top:38%;left:52%"></div>
+      <div class="pin pin-rust" style="top:55%;left:44%"></div>
+      <div class="pin pin-moss" style="top:28%;left:30%"></div>
+      <div class="pin pin-moss" style="top:65%;left:68%"></div>
+      <div class="pin pin-moss" style="top:22%;left:72%"></div>
+      <div class="pin pin-moss" style="top:78%;left:25%"></div>
+      <div class="pin pin-gold" style="top:42%;left:62%"></div>
+    </div>
+    <div class="phone-feed-peek">
+      <div class="feed-peek-title">Today on your block</div>
+      <div class="feed-peek-item">
+        <div class="feed-dot gold"></div>
+        <span class="feed-name">Northern Cardinal</span>
+        <span class="feed-time">7:12am</span>
+      </div>
+      <div class="feed-peek-item">
+        <div class="feed-dot rust"></div>
+        <span class="feed-name">Black-capped Chickadee</span>
+        <span class="feed-time">6:48am</span>
+      </div>
+      <div class="feed-peek-item">
+        <div class="feed-dot moss"></div>
+        <span class="feed-name">American Robin</span>
+        <span class="feed-time">nearby</span>
+      </div>
+    </div>
+    <div class="phone-tabs">
+      <span class="phone-tab active">Map</span>
+      <span class="phone-tab">Journal</span>
+      <span class="phone-tab">Birds</span>
+    </div>
+  </div>
+  <div class="map-caption reveal">
+    <h3>The Map</h3>
+    <p>Your neighborhood, drawn. Your yard outlined. Birds pinned where they were seen. One italic sentence tells you what happened while you were sleeping.</p>
+  </div>
+</section>
+
+<!-- ================ SCENE 4: PIN LEGEND ================ -->
+<section class="scene scene-pins">
+  <h3 class="reveal" style="font-family:var(--font-voice);font-style:italic;font-size:1.3rem;margin-bottom:8px;">Three kinds of pins</h3>
+  <div class="pin-legend">
+    <div class="pin-row reveal">
+      <div class="pin-sample rust"></div>
+      <div class="pin-explain">
+        <h4>Rust — yours</h4>
+        <p>Birds you've seen, logged through Merlin and eBird. Your personal record, placed on the map.</p>
+      </div>
+    </div>
+    <div class="pin-row reveal reveal-delay-1">
+      <div class="pin-sample gold"></div>
+      <div class="pin-explain">
+        <h4>Gold — today</h4>
+        <p>Fresh sightings, pulsing gently. Something was here this morning.</p>
+      </div>
+    </div>
+    <div class="pin-row reveal reveal-delay-2">
+      <div class="pin-sample moss"></div>
+      <div class="pin-explain">
+        <h4>Moss — nearby</h4>
+        <p>Other birders in the neighborhood. The ambient life of the area, quietly shown.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================ SCENE 5: VOICE LINE ================ -->
+<section class="scene scene-voice">
+  <span class="voice-label reveal">The voice line</span>
+  <div class="voice-carousel">
+    <div class="voice-example reveal reveal-delay-1">A cardinal visited your maple this morning.</div>
+    <div class="voice-example reveal reveal-delay-2">The chickadees are back on Sutton Place.</div>
+    <div class="voice-example reveal reveal-delay-3">A red-tailed hawk passed through the neighborhood yesterday.</div>
+  </div>
+</section>
+
+<!-- ================ SCENE 6: JOURNAL ================ -->
+<section class="scene scene-journal">
+  <div class="journal-mockup reveal">
+    <div class="journal-day-label">Today — Monday, May 26</div>
+    <div class="journal-entry">
+      <div class="j-species">Northern Cardinal</div>
+      <div class="j-meta">7:12am · your yard · 1</div>
+      <div class="j-note">First one this week. Singing from the top of the maple before sunrise.</div>
+    </div>
+    <div class="journal-entry">
+      <div class="j-species">Black-capped Chickadee</div>
+      <div class="j-meta">6:48am · your yard · 3</div>
+    </div>
+    <div class="journal-day-label" style="margin-top:12px">Yesterday</div>
+    <div class="journal-entry">
+      <div class="j-species">American Robin</div>
+      <div class="j-meta">8:15am · front walk · 2</div>
+      <div class="j-note">Pulling worms from the wet lawn after last night's rain.</div>
+    </div>
+  </div>
+  <div class="journal-caption reveal">
+    <h3>The Journal</h3>
+    <p>Every sighting becomes a memory. Time, place, weather, and a note if you want one. A quiet record that grows over months.</p>
+  </div>
+</section>
+
+<!-- ================ SCENE 7: THE DECK ================ -->
+<section class="scene scene-deck">
+  <div class="deck-mockup reveal">
+    <div class="deck-card unlocked">
+      <div class="card-icon">🐦</div>
+      <div class="card-name">Northern Cardinal</div>
+      <div class="card-count">12x</div>
+    </div>
+    <div class="deck-card unlocked">
+      <div class="card-icon">🐦</div>
+      <div class="card-name">Black-capped Chickadee</div>
+      <div class="card-count">8x</div>
+    </div>
+    <div class="deck-card unlocked">
+      <div class="card-icon">🐦</div>
+      <div class="card-name">American Robin</div>
+      <div class="card-count">5x</div>
+    </div>
+    <div class="deck-card unlocked">
+      <div class="card-icon">🦅</div>
+      <div class="card-name">Red-tailed Hawk</div>
+      <div class="card-count">2x</div>
+    </div>
+    <div class="deck-card locked">
+      <div class="card-icon">🐦</div>
+      <div class="card-name">Blue Jay</div>
+      <div class="card-count">nearby</div>
+    </div>
+    <div class="deck-card locked">
+      <div class="card-icon">🐦</div>
+      <div class="card-name">House Finch</div>
+      <div class="card-count">nearby</div>
+    </div>
+  </div>
+  <div class="deck-caption reveal">
+    <h3>The Collection</h3>
+    <p>Every species you see lights up a card. Species spotted nearby but not yet by you wait as silhouettes. A quiet collection that grows over time.</p>
+  </div>
+</section>
+
+<!-- ================ SCENE 8: HOW IT WORKS ================ -->
+<section class="scene scene-flow">
+  <div class="flow-caption reveal">
+    <h3>How it works</h3>
+  </div>
+  <div class="flow-steps" style="margin-top: 24px;">
+    <div class="flow-step reveal">
+      <div class="flow-num">1</div>
+      <div class="flow-text">
+        <h4>Spot a bird</h4>
+        <p>Use Merlin to identify it. Merlin does the hard part.</p>
+      </div>
+    </div>
+    <div class="flow-connector reveal"></div>
+    <div class="flow-step reveal reveal-delay-1">
+      <div class="flow-num">2</div>
+      <div class="flow-text">
+        <h4>It flows to eBird</h4>
+        <p>Your sighting syncs from Merlin to eBird automatically.</p>
+      </div>
+    </div>
+    <div class="flow-connector reveal"></div>
+    <div class="flow-step reveal reveal-delay-2">
+      <div class="flow-num">3</div>
+      <div class="flow-text">
+        <h4>Roost picks it up</h4>
+        <p>Next time you open Roost, your sighting appears on the map — tagged as yours, placed where you saw it.</p>
+      </div>
+    </div>
+    <div class="flow-connector reveal"></div>
+    <div class="flow-step reveal reveal-delay-3">
+      <div class="flow-num">4</div>
+      <div class="flow-text">
+        <h4>The neighborhood fills in</h4>
+        <p>Other birders nearby add ambient data. Your map comes alive with what's around you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================ SCENE 9: CLOSER ================ -->
+<section class="scene scene-close">
+  <p class="close-text reveal">Roost is not a birding tool.<br>Merlin is the birding tool.<br><br>Roost is what makes the birds<br>feel like neighbors.</p>
+  <a href="/" class="close-cta reveal reveal-delay-1">Open Roost</a>
+  <div class="close-byline reveal reveal-delay-2">for joelle</div>
+</section>
+
+<script>
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+reveals.forEach(el => observer.observe(el));
+
+// Parallax on leaves
+const leaves = document.querySelectorAll('.leaf');
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      const scrollY = window.scrollY;
+      leaves.forEach((leaf, i) => {
+        const speed = 0.03 + (i * 0.015);
+        leaf.style.transform = `translateY(${scrollY * speed}px)`;
+      });
+      ticking = false;
+    });
+    ticking = true;
+  }
+});
+</script>
+
+</body>
+</html>
