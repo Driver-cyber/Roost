@@ -72,19 +72,12 @@ html, body {
 .app-header {
   display: flex;
   align-items: flex-start;
-  padding-top: max(calc(var(--safe-top) + 12px), 54px);
+  padding-top: 12px;
   background: var(--paper);
   flex-shrink: 0;
   z-index: 10;
   position: relative;
 }
-
-@supports (padding-top: env(safe-area-inset-top)) {
-  @media all and (display-mode: standalone) {
-    .app-header {
-      padding-top: max(calc(env(safe-area-inset-top, 0px) + 12px), 54px);
-    }
-  }
 }
 
 .voice-line {
@@ -883,7 +876,7 @@ html, body {
 
 .toast {
   position: fixed;
-  top: max(calc(12px + var(--safe-top)), 56px);
+  top: 12px;
   left: 50%;
   transform: translateX(-50%) translateY(-120%);
   background: var(--ink);
