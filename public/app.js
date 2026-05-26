@@ -42,13 +42,20 @@ function initTabs() {
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const target = tab.dataset.view;
-      tabs.forEach(t => t.classList.remove('active'));
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
       views.forEach(v => v.classList.remove('active'));
       tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
       document.getElementById(target).classList.add('active');
 
       voiceWrap.style.display = target === 'view-map' ? '' : 'none';
       fab.style.display = target === 'view-deck' ? 'none' : '';
+
+      // Scroll view container to top on tab switch
+      document.querySelector('.view-container').scrollTop = 0;
     });
   });
 }
@@ -70,7 +77,7 @@ function initModal() {
   document.getElementById('input-time').value = now.toTimeString().slice(0, 5);
 
   fab.addEventListener('click', () => {
-    overlay.classList.add('open');
+    openOverlay(overlay);
     // Reset to manual form
     form.style.display = '';
     csvSection.style.display = 'none';
@@ -81,7 +88,7 @@ function initModal() {
   });
 
   overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.classList.remove('open');
+    if (e.target === overlay) closeOverlay(overlay);
   });
 
   btnImport.addEventListener('click', () => {
@@ -127,7 +134,7 @@ function initModal() {
     state.sightings.unshift(localEntry);
     renderAll();
 
-    overlay.classList.remove('open');
+    closeOverlay(overlay);
     form.reset();
     toast(`${species} added to your journal`);
 
@@ -711,16 +718,16 @@ function initDrawer() {
   const btnClose = document.getElementById('btn-drawer-close');
   const btnImport = document.getElementById('btn-drawer-import');
 
-  btnOpen.addEventListener('click', () => overlay.classList.add('open'));
-  btnClose.addEventListener('click', () => overlay.classList.remove('open'));
+  btnOpen.addEventListener('click', () => openOverlay(overlay));
+  btnClose.addEventListener('click', () => closeOverlay(overlay));
   overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.classList.remove('open');
+    if (e.target === overlay) closeOverlay(overlay);
   });
 
   btnImport.addEventListener('click', () => {
-    overlay.classList.remove('open');
+    closeOverlay(overlay);
     const addModal = document.getElementById('modal-add');
-    addModal.classList.add('open');
+    openOverlay(addModal);
     document.getElementById('form-sighting').style.display = 'none';
     document.getElementById('csv-import-section').style.display = '';
   });
@@ -753,21 +760,22 @@ const BINGO_TEMPLATES = [
 ];
 
 function initBingo() {
+  const bingoModal = document.getElementById('modal-bingo');
   document.getElementById('btn-bingo').addEventListener('click', () => {
-    document.getElementById('drawer-overlay').classList.remove('open');
+    closeOverlay(document.getElementById('drawer-overlay'));
     openBingo();
   });
   document.getElementById('btn-bingo-close').addEventListener('click', () => {
-    document.getElementById('modal-bingo').classList.remove('open');
+    closeOverlay(bingoModal);
   });
-  document.getElementById('modal-bingo').addEventListener('click', (e) => {
-    if (e.target.id === 'modal-bingo') document.getElementById('modal-bingo').classList.remove('open');
+  bingoModal.addEventListener('click', (e) => {
+    if (e.target === bingoModal) closeOverlay(bingoModal);
   });
 }
 
 function openBingo() {
   const modal = document.getElementById('modal-bingo');
-  modal.classList.add('open');
+  openOverlay(modal);
   renderBingo();
 }
 
@@ -921,20 +929,22 @@ function checkBingoRows(cells) {
 // Trophy Case
 // ----------------------------------------------------------------
 function initTrophies() {
+  const trophyModal = document.getElementById('modal-trophies');
   document.getElementById('btn-trophies').addEventListener('click', () => {
-    document.getElementById('drawer-overlay').classList.remove('open');
+    closeOverlay(document.getElementById('drawer-overlay'));
     openTrophies();
   });
   document.getElementById('btn-trophies-close').addEventListener('click', () => {
-    document.getElementById('modal-trophies').classList.remove('open');
+    closeOverlay(trophyModal);
   });
-  document.getElementById('modal-trophies').addEventListener('click', (e) => {
-    if (e.target.id === 'modal-trophies') document.getElementById('modal-trophies').classList.remove('open');
+  trophyModal.addEventListener('click', (e) => {
+    if (e.target === trophyModal) closeOverlay(trophyModal);
   });
 }
 
 function openTrophies() {
-  document.getElementById('modal-trophies').classList.add('open');
+  const modal = document.getElementById('modal-trophies');
+  openOverlay(modal);
   renderTrophies();
 }
 
@@ -1026,6 +1036,43 @@ function toast(message) {
   el.textContent = message;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// Open/close overlay helpers — manage body scroll lock + aria state
+function openOverlay(el) {
+  el.classList.add('open');
+  el.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+}
+
+function closeOverlay(el) {
+  el.classList.remove('open');
+  el.setAttribute('aria-hidden', 'true');
+  // Only remove body lock if no other overlays are open
+  const anyOpen = document.querySelector('.modal-overlay.open, .drawer-overlay.open');
+  if (!anyOpen) document.body.classList.remove('modal-open');
+}
+
+// Prevent iOS Safari from scrolling the page when focusing inputs in modals
+// The visual viewport API lets us detect when the keyboard opens and adjust
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    // When keyboard opens, iOS shrinks the visual viewport.
+    // Ensure open modals stay visible by adjusting max-height.
+    const openModal = document.querySelector('.modal-overlay.open .modal');
+    if (openModal) {
+      const vh = window.visualViewport.height;
+      openModal.style.maxHeight = (vh * 0.85) + 'px';
+    }
+  });
+
+  window.visualViewport.addEventListener('scroll', () => {
+    // Prevent iOS Safari from scrolling the fixed-position page
+    // when focusing form inputs inside modals
+    if (document.body.classList.contains('modal-open')) {
+      window.scrollTo(0, 0);
+    }
+  });
 }
 
 // Service worker
