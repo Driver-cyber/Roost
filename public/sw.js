@@ -1,6 +1,7 @@
-const CACHE_NAME = 'roost-v1';
+const CACHE_NAME = 'roost-v2';
 const STATIC_ASSETS = [
   '/',
+  '/index.html',
   '/styles.css',
   '/app.js',
   '/manifest.json',

@@ -40,12 +40,14 @@ html, body {
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%; /* Prevent iOS text size inflation */
   overscroll-behavior: none;
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
   position: fixed;
   width: 100%;
+  touch-action: manipulation; /* Eliminate 300ms tap delay globally */
 }
 
 /* ================================================================
@@ -81,6 +83,8 @@ html, body {
   flex: 1;
   padding: 10px 8px 8px 24px;
   text-align: center;
+  min-width: 0; /* Allow flex child to shrink below content size */
+  overflow: hidden;
 }
 
 .gear-btn {
@@ -131,7 +135,7 @@ html, body {
 
 .view {
   display: none;
-  padding-bottom: 20px;
+  padding-bottom: 72px; /* Clear the FAB (52px) + margin */
   animation: viewFadeIn 0.25s ease;
 }
 
@@ -145,6 +149,10 @@ html, body {
 /* ================================================================
    MAP VIEW
    ================================================================ */
+
+#view-map {
+  padding-bottom: 20px; /* Map view has bottom sheet; less padding needed */
+}
 
 #view-map .map-wrap {
   margin: 0 14px;
@@ -222,8 +230,12 @@ html, body {
 
 /* Pin dot classes are now rendered as ::after pseudo-elements
    on the .pin parent — see the "Map pin touch targets" section.
-   These empty rules preserved only for clarity; styles live on
-   .pin.pin-rust::after etc. */
+   Styles live on .pin.pin-rust::after etc. */
+
+@keyframes goldGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(212, 169, 66, 0.4); }
+  50% { box-shadow: 0 0 14px rgba(212, 169, 66, 0.6); }
+}
 
 /* ================================================================
    BOTTOM SHEET — "Today on your block"
@@ -267,6 +279,7 @@ html, body {
   gap: 12px;
   padding: 11px 0;
   border-bottom: 1px solid #ece5d6;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .feed-item:last-child { border-bottom: none; }
@@ -353,6 +366,7 @@ html, body {
   border-radius: var(--radius-md);
   border: 1px solid #ece5d6;
   transition: transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .journal-entry:active { transform: scale(0.985); }
@@ -452,6 +466,7 @@ html, body {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .deck-card:active { transform: scale(0.96); }
@@ -583,6 +598,7 @@ html, body {
   max-height: 85vh;
   max-height: 85dvh; /* dynamic viewport height for iOS Safari */
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
 
@@ -708,9 +724,11 @@ html, body {
   border: 2px dashed #d4cbb8;
   border-radius: var(--radius-md);
   padding: 24px 16px;
+  min-height: 100px; /* Generous tap target for file selection */
   text-align: center;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .csv-drop:hover, .csv-drop.dragover {
@@ -845,7 +863,7 @@ html, body {
 
 .tab span {
   font-family: var(--font-ui);
-  font-size: 0.6rem;
+  font-size: 0.625rem; /* 10px — minimum readable size for tab labels */
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -871,6 +889,7 @@ html, body {
   white-space: nowrap;
   max-width: calc(100vw - 40px);
   text-align: center;
+  pointer-events: none; /* Don't block taps on content behind toast */
 }
 
 .toast.show {
@@ -1200,6 +1219,13 @@ html, body {
 body.modal-open {
   overflow: hidden;
   touch-action: none;
+  -webkit-overflow-scrolling: auto;
+}
+
+/* Prevent content behind overlay from scrolling on iOS */
+body.modal-open .view-container {
+  overflow: hidden;
+  pointer-events: none;
 }
 
 /* Map pin touch targets — ensure minimum tappable area.
@@ -1251,6 +1277,11 @@ body.modal-open {
   background: var(--moss);
   border: 1.5px solid var(--paper);
   opacity: 0.7;
+}
+
+/* Prevent callout/selection menus on long-press for interactive elements */
+a, button, [role="button"] {
+  -webkit-touch-callout: none;
 }
 
 .sr-only {

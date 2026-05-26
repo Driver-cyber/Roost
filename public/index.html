@@ -30,7 +30,7 @@
         <p id="voice-text"></p>
       </div>
       <button class="gear-btn" id="btn-settings" aria-label="Settings">
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
         </svg>
@@ -41,7 +41,7 @@
     <div class="view-container">
 
       <!-- ============ MAP VIEW ============ -->
-      <div id="view-map" class="view active">
+      <div id="view-map" class="view active" role="tabpanel">
         <div class="map-wrap">
           <div id="map"></div>
           <div class="map-loading" id="map-loading">
@@ -59,7 +59,7 @@
       </div>
 
       <!-- ============ JOURNAL VIEW ============ -->
-      <div id="view-journal" class="view">
+      <div id="view-journal" class="view" role="tabpanel">
         <div class="journal-header">
           <h1>Field Journal</h1>
           <span class="species-count" id="journal-species-count"></span>
@@ -68,7 +68,7 @@
       </div>
 
       <!-- ============ DECK VIEW ============ -->
-      <div id="view-deck" class="view">
+      <div id="view-deck" class="view" role="tabpanel">
         <div class="deck-header">
           <h1>Birds</h1>
           <span class="deck-stats" id="deck-stats"></span>
@@ -79,21 +79,21 @@
 
     <!-- FAB — Add Sighting -->
     <button class="fab" id="fab-add" aria-label="Add sighting">
-      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
 
     <!-- Tab bar -->
-    <nav class="tab-bar">
-      <button class="tab active" data-view="view-map" aria-label="Map">
-        <svg viewBox="0 0 24 24">
+    <nav class="tab-bar" aria-label="Main navigation" role="tablist">
+      <button class="tab active" data-view="view-map" aria-label="Map" role="tab" aria-selected="true" aria-controls="view-map">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
           <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
           <line x1="8" y1="2" x2="8" y2="18"/>
           <line x1="16" y1="6" x2="16" y2="22"/>
         </svg>
         <span>Map</span>
       </button>
-      <button class="tab" data-view="view-journal" aria-label="Journal">
-        <svg viewBox="0 0 24 24">
+      <button class="tab" data-view="view-journal" aria-label="Journal" role="tab" aria-selected="false" aria-controls="view-journal">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
           <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
           <line x1="8" y1="7" x2="16" y2="7"/>
@@ -101,8 +101,8 @@
         </svg>
         <span>Journal</span>
       </button>
-      <button class="tab" data-view="view-deck" aria-label="Birds">
-        <svg viewBox="0 0 24 24">
+      <button class="tab" data-view="view-deck" aria-label="Birds" role="tab" aria-selected="false" aria-controls="view-deck">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M18 8c0-3.3-2.7-6-6-6S6 4.7 6 8c0 2.5 1.5 4.6 3.6 5.5"/>
           <path d="M12 2c1 2 4 4 4 8"/>
           <ellipse cx="12" cy="16" rx="5" ry="4"/>
@@ -116,12 +116,12 @@
   </div>
 
   <!-- ============ SETTINGS DRAWER ============ -->
-  <div class="drawer-overlay" id="drawer-overlay">
+  <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true">
     <div class="drawer" id="drawer">
       <div class="drawer-header">
         <h2>Roost</h2>
-        <button class="drawer-close" id="btn-drawer-close" aria-label="Close">
-          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button class="drawer-close" id="btn-drawer-close" aria-label="Close settings">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
@@ -172,8 +172,8 @@
   </div>
 
   <!-- ============ BINGO SCREEN ============ -->
-  <div class="modal-overlay" id="modal-bingo">
-    <div class="modal bingo-modal">
+  <div class="modal-overlay" id="modal-bingo" aria-hidden="true">
+    <div class="modal bingo-modal" role="dialog" aria-modal="true" aria-label="Daily Bingo">
       <div class="modal-handle"></div>
       <h2>Daily Bingo</h2>
       <div class="bingo-date" id="bingo-date"></div>
@@ -184,8 +184,8 @@
   </div>
 
   <!-- ============ TROPHY CASE ============ -->
-  <div class="modal-overlay" id="modal-trophies">
-    <div class="modal">
+  <div class="modal-overlay" id="modal-trophies" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Trophy Case">
       <div class="modal-handle"></div>
       <h2>Trophy Case</h2>
       <div class="trophy-grid" id="trophy-grid"></div>
@@ -195,8 +195,8 @@
   </div>
 
   <!-- ============ ADD SIGHTING MODAL ============ -->
-  <div class="modal-overlay" id="modal-add">
-    <div class="modal">
+  <div class="modal-overlay" id="modal-add" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Log a sighting">
       <div class="modal-handle"></div>
       <h2>Log a sighting</h2>
       <form id="form-sighting" autocomplete="off">
@@ -244,7 +244,7 @@
   </div>
 
   <!-- Toast -->
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="/app.js"></script>
 </body>
