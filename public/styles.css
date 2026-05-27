@@ -346,6 +346,10 @@ html, body {
   color: var(--ink-faint);
 }
 
+.journal-header .journal-toggle {
+  flex-shrink: 0;
+}
+
 .journal-date-group { margin-bottom: 24px; }
 
 .journal-date-label {
@@ -1525,6 +1529,228 @@ a, button, [role="button"] {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+/* ================================================================
+   QUICK ADD TRAY
+   ================================================================ */
+
+.quickadd-tray {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--paper-warm);
+  border-top: 1px solid #e0d8ca;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: 16px 20px;
+  padding-bottom: calc(16px + var(--safe-bottom, 0px));
+  z-index: 150;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 -4px 20px rgba(43, 34, 24, 0.1);
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.quickadd-tray.open {
+  transform: translateY(0);
+}
+
+.quickadd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.quickadd-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  padding: 4px 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.quickadd-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quickadd-chip {
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #e0d8ca;
+  background: var(--paper);
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s ease;
+}
+
+.quickadd-chip:active {
+  background: var(--rust);
+  color: var(--paper);
+  border-color: var(--rust);
+}
+
+.quickadd-hint {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--ink-faint);
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* ================================================================
+   JOURNAL TOGGLE & COMPOSE MODE
+   ================================================================ */
+
+.journal-toggle {
+  display: flex;
+  gap: 0;
+  border-radius: 20px;
+  border: 1.5px solid #e0d8ca;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  padding: 5px 16px;
+  border: none;
+  background: var(--paper);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ink-faint);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: var(--rust);
+  color: var(--paper);
+}
+
+.compose-prompt {
+  background: var(--paper-warm);
+  border-radius: var(--radius-lg);
+  border: 1px solid #e8dfd0;
+  padding: 18px;
+  margin-bottom: 16px;
+  text-align: center;
+  display: none;
+}
+
+.compose-prompt.visible {
+  display: block;
+}
+
+.compose-prompt-text {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.compose-prompt-refresh {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.compose-area {
+  padding: 0 4px;
+}
+
+.compose-input {
+  width: 100%;
+  border: 1.5px solid #e0d8ca;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--paper);
+  resize: none;
+  line-height: 1.5;
+  -webkit-appearance: none;
+}
+
+.compose-input:focus {
+  outline: none;
+  border-color: var(--rust);
+}
+
+.compose-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.compose-tools {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.compose-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e0d8ca;
+  background: var(--paper);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.compose-tool:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.compose-tool span:first-child {
+  font-size: 1rem;
+}
+
+.compose-photo-preview {
+  margin-top: 12px;
+}
+
+.compose-photo-preview img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid #e0d8ca;
+}
+
+.compose-submit {
+  margin-top: 16px;
+  width: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
