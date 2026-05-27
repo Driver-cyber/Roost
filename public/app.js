@@ -38,6 +38,114 @@ function loadLocal() {
 }
 
 // ----------------------------------------------------------------
+// Journal Prompts
+// ----------------------------------------------------------------
+const JOURNAL_PROMPTS = [
+  "What's the light doing right now?",
+  "What sound defined your morning?",
+  "Describe the air.",
+  "What's growing that wasn't there last week?",
+  "If your block had a mood today, what would it be?",
+  "What did you almost walk past without noticing?",
+  "What's the oldest living thing you can see from here?",
+  "What would a bird see looking down at your street?",
+  "Close your eyes for 10 seconds. What did you hear?",
+  "What smells are in the air right now?",
+  "What's moving out there?",
+  "Describe your yard in one sentence.",
+  "What's the sky doing?",
+  "What's the most surprising thing you've seen this week?",
+  "If you could name this week's weather, what would you call it?",
+  "What creature owns your block right now?",
+];
+
+// ----------------------------------------------------------------
+// Quick Add Helpers
+// ----------------------------------------------------------------
+function getFrequentSpecies() {
+  const obs = loadLocal();
+  const counts = {};
+  for (const o of obs) {
+    if (o.type === 'fauna' && o.title) {
+      counts[o.title] = (counts[o.title] || 0) + 1;
+    }
+  }
+  // Also count from current state (includes ebird/home but filter to manual/csv)
+  for (const o of state.sightings) {
+    if ((o.source === 'manual' || o.source === 'csv' || o.source === 'home') && (!o.type || o.type === 'fauna') && o.common_name) {
+      const name = o.title || o.common_name;
+      counts[name] = (counts[name] || 0) + 1;
+    }
+  }
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([name]) => name);
+}
+
+let quickAddTrayOpen = false;
+
+function openQuickAddTray() {
+  const tray = document.getElementById('quickadd-tray');
+  const chips = document.getElementById('quickadd-chips');
+  const hint = document.getElementById('quickadd-hint');
+
+  const species = getFrequentSpecies();
+
+  if (species.length === 0) {
+    chips.innerHTML = '<div style="font-family:var(--font-voice);font-style:italic;font-size:0.88rem;color:var(--ink-soft);padding:12px 0;">Log a few sightings first, then your favorites will appear here.</div>';
+    hint.textContent = '';
+  } else {
+    chips.innerHTML = species.map(name =>
+      `<button class="quickadd-chip" data-species="${name.replace(/"/g, '&quot;')}">${name}</button>`
+    ).join('');
+    hint.textContent = 'Tap to log instantly with current time & home location';
+
+    chips.querySelectorAll('.quickadd-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const speciesName = chip.dataset.species;
+        const now = new Date();
+        const observation = {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          type: 'fauna',
+          title: speciesName,
+          common_name: speciesName,
+          observed_at: now.toISOString().split('.')[0],
+          lat: HOME.lat,
+          lon: HOME.lon,
+          source: 'manual',
+          zone: 'yard',
+          count: 1,
+          notes: null,
+        };
+        state.sightings.unshift(observation);
+        saveLocal();
+        renderAll();
+        toast(`${speciesName} logged`);
+
+        // Fire-and-forget to API
+        try {
+          fetch(`${API}/sightings`, {
+            method: 'POST',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify(observation),
+          }).catch(() => {});
+        } catch (_) {}
+      });
+    });
+  }
+
+  tray.classList.add('open');
+  quickAddTrayOpen = true;
+}
+
+function closeQuickAddTray() {
+  const tray = document.getElementById('quickadd-tray');
+  tray.classList.remove('open');
+  quickAddTrayOpen = false;
+}
+
+// ----------------------------------------------------------------
 // Init
 // ----------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
@@ -137,6 +245,11 @@ function initModal() {
   });
 
   function openLogModal(type) {
+    if (type === 'quickadd') {
+      openQuickAddTray();
+      return;
+    }
+
     openOverlay(overlay);
     form.style.display = '';
     csvSection.style.display = 'none';
@@ -212,6 +325,144 @@ function initModal() {
         headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(observation),
       });
+    } catch (_) {}
+  });
+
+  // Quick Add tray close
+  document.getElementById('quickadd-close').addEventListener('click', closeQuickAddTray);
+
+  // Close quickadd tray when tapping outside (on the fab backdrop area)
+  document.addEventListener('click', (e) => {
+    if (quickAddTrayOpen) {
+      const tray = document.getElementById('quickadd-tray');
+      if (!tray.contains(e.target)) {
+        closeQuickAddTray();
+      }
+    }
+  });
+
+  // ---- Journal Compose Mode ----
+  const btnRead = document.getElementById('btn-journal-read');
+  const btnWrite = document.getElementById('btn-journal-write');
+  const readMode = document.getElementById('journal-read-mode');
+  const writeMode = document.getElementById('journal-write-mode');
+  const composePrompt = document.getElementById('compose-prompt');
+  const composePromptText = document.getElementById('compose-prompt-text');
+  const composePromptRefresh = document.getElementById('compose-prompt-refresh');
+  const composePromptBtn = document.getElementById('compose-prompt-btn');
+  const composeInput = document.getElementById('compose-input');
+  const composeSubmit = document.getElementById('compose-submit');
+  const composePhotoInput = document.getElementById('compose-photo-input');
+  const composePhotoPreview = document.getElementById('compose-photo-preview');
+
+  let composePhotoData = null;
+
+  function pickRandomPrompt() {
+    return JOURNAL_PROMPTS[Math.floor(Math.random() * JOURNAL_PROMPTS.length)];
+  }
+
+  btnRead.addEventListener('click', () => {
+    btnRead.classList.add('active');
+    btnWrite.classList.remove('active');
+    readMode.style.display = '';
+    writeMode.style.display = 'none';
+  });
+
+  btnWrite.addEventListener('click', () => {
+    btnWrite.classList.add('active');
+    btnRead.classList.remove('active');
+    readMode.style.display = 'none';
+    writeMode.style.display = '';
+  });
+
+  composePromptBtn.addEventListener('click', () => {
+    composePrompt.classList.toggle('visible');
+    if (composePrompt.classList.contains('visible')) {
+      composePromptText.textContent = pickRandomPrompt();
+    }
+  });
+
+  composePromptRefresh.addEventListener('click', () => {
+    composePromptText.textContent = pickRandomPrompt();
+  });
+
+  composePhotoInput.addEventListener('change', () => {
+    const file = composePhotoInput.files[0];
+    if (!file) return;
+
+    // Resize and convert to data URL (max ~200KB)
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 800;
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        composePhotoData = canvas.toDataURL('image/jpeg', 0.7);
+        composePhotoPreview.innerHTML = `<img src="${composePhotoData}" alt="Photo preview">`;
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  composeSubmit.addEventListener('click', () => {
+    const text = composeInput.value.trim();
+    if (!text) return;
+
+    const now = new Date();
+    const title = text.length > 50 ? text.substring(0, 50) + '...' : text;
+
+    const observation = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+      type: 'journal',
+      title: title,
+      common_name: title,
+      observed_at: now.toISOString().split('.')[0],
+      lat: HOME.lat,
+      lon: HOME.lon,
+      source: 'manual',
+      zone: 'yard',
+      count: null,
+      notes: text,
+    };
+
+    if (composePhotoData) {
+      observation.payload = { photo: composePhotoData };
+    }
+
+    state.sightings.unshift(observation);
+    saveLocal();
+    renderAll();
+
+    // Reset compose area
+    composeInput.value = '';
+    composePhotoData = null;
+    composePhotoPreview.innerHTML = '';
+    composePrompt.classList.remove('visible');
+
+    // Switch back to read mode
+    btnRead.classList.add('active');
+    btnWrite.classList.remove('active');
+    readMode.style.display = '';
+    writeMode.style.display = 'none';
+
+    toast('Added to your journal');
+
+    // Fire-and-forget to API
+    try {
+      fetch(`${API}/sightings`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(observation),
+      }).catch(() => {});
     } catch (_) {}
   });
 }
@@ -446,6 +697,7 @@ function rebuildSpeciesFromSightings() {
 function renderAll() {
   renderVoiceLine();
   renderTodayFeed();
+  renderNearbyFeed();
   renderJournal();
   renderExplore();
   renderMapPins();
@@ -559,11 +811,31 @@ function feedItemHTML(s) {
 }
 
 // ----------------------------------------------------------------
+// Nearby Feed (bottom sheet)
+// ----------------------------------------------------------------
+function renderNearbyFeed() {
+  const container = document.getElementById('nearby-feed');
+  const countEl = document.getElementById('nearby-count');
+  const section = document.getElementById('nearby-section');
+
+  const nearbySightings = state.sightings.filter(s => s.source === 'ebird');
+  const display = nearbySightings.slice(0, 10);
+
+  if (display.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+  countEl.textContent = `${nearbySightings.length} sighting${nearbySightings.length !== 1 ? 's' : ''}`;
+  container.innerHTML = display.map(s => feedItemHTML(s)).join('');
+}
+
+// ----------------------------------------------------------------
 // Journal
 // ----------------------------------------------------------------
 function renderJournal() {
   const container = document.getElementById('journal-entries');
-  const countEl = document.getElementById('journal-species-count');
 
   if (state.sightings.length === 0) {
     container.innerHTML = `
@@ -572,11 +844,8 @@ function renderJournal() {
         <p>Your journal is waiting.</p>
         <span class="hint">Each sighting becomes a story.</span>
       </div>`;
-    countEl.textContent = '';
     return;
   }
-
-  countEl.textContent = `${state.species.length} species`;
 
   // Group by date
   const groups = {};

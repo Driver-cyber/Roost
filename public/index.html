@@ -55,6 +55,14 @@
             <span class="count" id="today-count"></span>
           </div>
           <div id="today-feed"></div>
+
+          <div class="nearby-section" id="nearby-section">
+            <div class="bottom-sheet-header" style="margin-top:14px;">
+              <h2>Nearby</h2>
+              <span class="count" id="nearby-count"></span>
+            </div>
+            <div id="nearby-feed"></div>
+          </div>
         </div>
       </div>
 
@@ -62,9 +70,44 @@
       <div id="view-journal" class="view" role="tabpanel">
         <div class="journal-header">
           <h1>Field Journal</h1>
-          <span class="species-count" id="journal-species-count"></span>
+          <div class="journal-toggle">
+            <button class="toggle-btn active" data-mode="read" id="btn-journal-read">Read</button>
+            <button class="toggle-btn" data-mode="write" id="btn-journal-write">Write</button>
+          </div>
         </div>
-        <div id="journal-entries"></div>
+
+        <!-- Read mode -->
+        <div id="journal-read-mode">
+          <div id="journal-entries"></div>
+        </div>
+
+        <!-- Write mode -->
+        <div id="journal-write-mode" style="display:none;">
+          <div class="compose-prompt" id="compose-prompt">
+            <div class="compose-prompt-text" id="compose-prompt-text"></div>
+            <button class="compose-prompt-refresh" id="compose-prompt-refresh">&#8635; new prompt</button>
+          </div>
+          <div class="compose-area">
+            <textarea class="compose-input" id="compose-input" placeholder="What did you notice?" rows="3"></textarea>
+            <div class="compose-tools">
+              <label class="compose-tool" id="compose-photo-btn">
+                <span>&#x1F4F8;</span>
+                <span>Photo</span>
+                <input type="file" accept="image/*" capture="environment" id="compose-photo-input" style="display:none;">
+              </label>
+              <button class="compose-tool" id="compose-voice-btn" disabled title="Coming soon">
+                <span>&#x1F399;&#xFE0F;</span>
+                <span>Voice</span>
+              </button>
+              <button class="compose-tool" id="compose-prompt-btn">
+                <span>&#x270D;&#xFE0F;</span>
+                <span>Prompt</span>
+              </button>
+            </div>
+            <div class="compose-photo-preview" id="compose-photo-preview"></div>
+            <button class="btn-primary compose-submit" id="compose-submit">Add to journal</button>
+          </div>
+        </div>
       </div>
 
       <!-- ============ EXPLORE VIEW ============ -->
@@ -102,9 +145,9 @@
     <!-- FAB — Add Entry -->
     <div class="fab-backdrop" id="fab-backdrop"></div>
     <div class="fab-container" id="fab-container">
-      <button class="fab-option" data-type="journal" aria-label="Journal entry">
-        <span>✏️</span>
-        <span class="fab-label">Journal</span>
+      <button class="fab-option" data-type="quickadd" aria-label="Quick add">
+        <span>⚡</span>
+        <span class="fab-label">Quick Add</span>
       </button>
       <button class="fab-option" data-type="fauna" aria-label="Log fauna">
         <span>🐾</span>
@@ -117,6 +160,16 @@
       <button class="fab" id="fab-add" aria-label="Add entry">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
+    </div>
+
+    <!-- Quick Add Tray -->
+    <div class="quickadd-tray" id="quickadd-tray">
+      <div class="quickadd-header">
+        <span>Quick Add</span>
+        <button class="quickadd-close" id="quickadd-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="quickadd-chips" id="quickadd-chips"></div>
+      <div class="quickadd-hint" id="quickadd-hint"></div>
     </div>
 
     <!-- Tab bar -->
