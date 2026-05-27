@@ -67,13 +67,35 @@
         <div id="journal-entries"></div>
       </div>
 
-      <!-- ============ DECK VIEW ============ -->
-      <div id="view-deck" class="view" role="tabpanel">
-        <div class="deck-header">
-          <h1>Birds</h1>
-          <span class="deck-stats" id="deck-stats"></span>
+      <!-- ============ EXPLORE VIEW ============ -->
+      <div id="view-explore" class="view" role="tabpanel">
+        <div class="explore-header">
+          <h1>Explore</h1>
+          <span class="explore-subtitle" id="explore-subtitle"></span>
         </div>
-        <div id="deck-grid" class="deck-grid"></div>
+
+        <div class="explore-section" id="explore-prompt">
+          <div class="explore-card prompt-card">
+            <div class="prompt-icon" id="prompt-icon"></div>
+            <div class="prompt-text" id="prompt-text"></div>
+            <div class="prompt-meta" id="prompt-meta"></div>
+          </div>
+        </div>
+
+        <div class="explore-section">
+          <div class="explore-label">Quests</div>
+          <div id="explore-quests"></div>
+        </div>
+
+        <div class="explore-section">
+          <div class="explore-label">Your neighborhood</div>
+          <div id="explore-stats"></div>
+        </div>
+
+        <div class="explore-section">
+          <div class="explore-label">Collection</div>
+          <div id="explore-collection" class="deck-grid"></div>
+        </div>
       </div>
     </div>
 
@@ -101,16 +123,12 @@
         </svg>
         <span>Journal</span>
       </button>
-      <button class="tab" data-view="view-deck" aria-label="Birds" role="tab" aria-selected="false" aria-controls="view-deck">
+      <button class="tab" data-view="view-explore" aria-label="Explore" role="tab" aria-selected="false" aria-controls="view-explore">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M18 8c0-3.3-2.7-6-6-6S6 4.7 6 8c0 2.5 1.5 4.6 3.6 5.5"/>
-          <path d="M12 2c1 2 4 4 4 8"/>
-          <ellipse cx="12" cy="16" rx="5" ry="4"/>
-          <circle cx="10.5" cy="15.5" r="0.8" fill="currentColor" stroke="none"/>
-          <path d="M14 16.5l2 1"/>
-          <path d="M9 20l-1 2M15 20l1 2"/>
+          <circle cx="12" cy="12" r="10"/>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
         </svg>
-        <span>Birds</span>
+        <span>Explore</span>
       </button>
     </nav>
   </div>
@@ -225,11 +243,19 @@
   <div class="modal-overlay" id="modal-add" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-label="Log a sighting">
       <div class="modal-handle"></div>
-      <h2>Log a sighting</h2>
+      <h2>What did you notice?</h2>
       <form id="form-sighting" autocomplete="off">
         <div class="form-group">
-          <label for="input-species">What did you see?</label>
-          <input type="text" id="input-species" placeholder="e.g., Northern Cardinal" required>
+          <div class="type-chips" id="type-chips">
+            <button type="button" class="type-chip active" data-type="bird">Bird</button>
+            <button type="button" class="type-chip" data-type="animal">Animal</button>
+            <button type="button" class="type-chip" data-type="plant">Plant</button>
+            <button type="button" class="type-chip" data-type="moment">Moment</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="input-species" id="input-species-label">What was it?</label>
+          <input type="text" id="input-species" placeholder="e.g., Vaux's Swift" required>
         </div>
         <div class="form-row">
           <div class="form-group">
