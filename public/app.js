@@ -402,7 +402,7 @@ async function loadData() {
           species_code: obs.species_code,
           lat: obs.lat,
           lon: obs.lon,
-          observed_at: obs.observed_at,
+          observed_at: (obs.observed_at || '').replace(' ', 'T'),
           count: obs.count,
           place_name: isYard ? 'Your yard' : isBlock ? 'Your block' : obs.location_name,
           source: isBlock ? 'home' : 'ebird',
@@ -479,14 +479,17 @@ const fallbackVoiceLines = [
 function renderVoiceLine() {
   const el = document.getElementById('voice-text');
   const today = new Date().toISOString().split('T')[0];
-  const todaySightings = state.sightings.filter(s => s.observed_at?.startsWith(today));
+  const faunaSightings = state.sightings.filter(s =>
+    (!s.type || s.type === 'fauna') && s.common_name
+  );
+  const todayFauna = faunaSightings.filter(s => s.observed_at?.startsWith(today));
 
-  if (todaySightings.length > 0) {
-    const latest = todaySightings[0];
+  if (todayFauna.length > 0) {
+    const latest = todayFauna[0];
     const template = voiceTemplates[Math.floor(Math.random() * voiceTemplates.length)];
     el.textContent = template(latest);
-  } else if (state.sightings.length > 0) {
-    const latest = state.sightings[0];
+  } else if (faunaSightings.length > 0) {
+    const latest = faunaSightings[0];
     const daysAgo = Math.floor((Date.now() - new Date(latest.observed_at)) / 86400000);
     if (daysAgo <= 3) {
       const n = latest.common_name.toLowerCase();
@@ -578,7 +581,8 @@ function renderJournal() {
   // Group by date
   const groups = {};
   for (const s of state.sightings) {
-    const date = s.observed_at?.split('T')[0] || 'Unknown';
+    const dateRaw = s.observed_at?.replace(' ', 'T') || '';
+    const date = dateRaw.split('T')[0] || 'Unknown';
     if (!groups[date]) groups[date] = [];
     groups[date].push(s);
   }
@@ -1204,13 +1208,14 @@ function renderTrophies() {
 // ----------------------------------------------------------------
 function isToday(dateStr) {
   if (!dateStr) return false;
-  return dateStr.startsWith(new Date().toISOString().split('T')[0]);
+  const normalized = dateStr.replace(' ', 'T');
+  return normalized.startsWith(new Date().toISOString().split('T')[0]);
 }
 
 function formatTime(dateStr) {
   if (!dateStr) return '';
   try {
-    const d = new Date(dateStr);
+    const d = new Date(dateStr.replace(' ', 'T'));
     return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
   } catch (_) { return ''; }
 }
