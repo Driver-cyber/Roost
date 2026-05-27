@@ -44,7 +44,6 @@ function initTabs() {
   const tabs = document.querySelectorAll('.tab');
   const views = document.querySelectorAll('.view');
   const voiceWrap = document.getElementById('voice-line-wrap');
-  const fab = document.getElementById('fab-add');
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -59,7 +58,6 @@ function initTabs() {
       document.getElementById(target).classList.add('active');
 
       voiceWrap.style.display = target === 'view-map' ? '' : 'none';
-      fab.style.display = target === 'view-explore' ? 'none' : '';
 
       // Scroll view container to top on tab switch
       document.querySelector('.view-container').scrollTop = 0;
@@ -73,6 +71,8 @@ function initTabs() {
 function initModal() {
   const overlay = document.getElementById('modal-add');
   const fab = document.getElementById('fab-add');
+  const fabContainer = document.getElementById('fab-container');
+  const fabBackdrop = document.getElementById('fab-backdrop');
   const form = document.getElementById('form-sighting');
   const csvSection = document.getElementById('csv-import-section');
   const btnImport = document.getElementById('btn-import-csv');
@@ -85,9 +85,9 @@ function initModal() {
 
   // Type chip selection
   const typeChips = document.querySelectorAll('.type-chip');
-  let selectedType = 'bird';
-  const placeholders = { bird: 'e.g., Vaux\'s Swift', animal: 'e.g., Coyote', plant: 'e.g., Douglas Fir', moment: 'e.g., Sunset over the rooftops' };
-  const labels = { bird: 'What was it?', animal: 'What did you see?', plant: 'What is it?', moment: 'Describe the moment' };
+  let selectedType = 'fauna';
+  const placeholders = { fauna: 'e.g., Vaux\'s Swift, Coyote', flora: 'e.g., Douglas Fir, Blackberries', journal: 'What did you notice?' };
+  const labels = { fauna: 'What creature?', flora: 'What plant?', journal: 'Describe the moment' };
 
   typeChips.forEach(chip => {
     chip.addEventListener('click', () => {
@@ -97,11 +97,32 @@ function initModal() {
       document.getElementById('input-species').placeholder = placeholders[selectedType];
       document.getElementById('input-species-label').textContent = labels[selectedType];
       const countGroup = document.getElementById('input-count').closest('.form-group');
-      countGroup.style.display = selectedType === 'moment' ? 'none' : '';
+      countGroup.style.display = selectedType === 'journal' ? 'none' : '';
     });
   });
 
+  // Radial FAB toggle
   fab.addEventListener('click', () => {
+    fabContainer.classList.toggle('open');
+    fabBackdrop.classList.toggle('open');
+  });
+
+  fabBackdrop.addEventListener('click', () => {
+    fabContainer.classList.remove('open');
+    fabBackdrop.classList.remove('open');
+  });
+
+  // FAB option buttons
+  document.querySelectorAll('.fab-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      fabContainer.classList.remove('open');
+      fabBackdrop.classList.remove('open');
+      const type = btn.dataset.type;
+      openLogModal(type);
+    });
+  });
+
+  function openLogModal(type) {
     openOverlay(overlay);
     form.style.display = '';
     csvSection.style.display = 'none';
@@ -109,7 +130,19 @@ function initModal() {
     const n = new Date();
     document.getElementById('input-date').value = n.toISOString().split('T')[0];
     document.getElementById('input-time').value = n.toTimeString().slice(0, 5);
-  });
+
+    // Set the active type chip
+    selectedType = type;
+    typeChips.forEach(c => c.classList.remove('active'));
+    const matchingChip = document.querySelector(`.type-chip[data-type="${type}"]`);
+    if (matchingChip) matchingChip.classList.add('active');
+
+    // Update placeholder, label, and count visibility
+    document.getElementById('input-species').placeholder = placeholders[type];
+    document.getElementById('input-species-label').textContent = labels[type];
+    const countGroup = document.getElementById('input-count').closest('.form-group');
+    countGroup.style.display = type === 'journal' ? 'none' : '';
+  }
 
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeOverlay(overlay);
@@ -140,7 +173,7 @@ function initModal() {
     const sighting = {
       common_name: species,
       observed_at,
-      count: selectedType === 'moment' ? null : (count ? parseInt(count) : 1),
+      count: selectedType === 'journal' ? null : (count ? parseInt(count) : 1),
       notes: notes || null,
       lat: HOME.lat,
       lon: HOME.lon,
@@ -348,7 +381,8 @@ async function loadData() {
       const data = await ebirdRes.json();
       const ebirdSightings = (data.observations || []).map(obs => {
         const distM = haversineM(HOME.lat, HOME.lon, obs.lat, obs.lon);
-        const isHome = distM < 150;
+        const isYard = distM < 150;
+        const isBlock = distM < 457;
         return {
           id: 'ebird-' + obs.species_code + '-' + obs.observed_at,
           common_name: obs.common_name,
@@ -358,8 +392,8 @@ async function loadData() {
           lon: obs.lon,
           observed_at: obs.observed_at,
           count: obs.count,
-          place_name: isHome ? 'Your yard' : obs.location_name,
-          source: isHome ? 'home' : 'ebird',
+          place_name: isYard ? 'Your yard' : isBlock ? 'Your block' : obs.location_name,
+          source: isBlock ? 'home' : 'ebird',
         };
       });
       state.sightings = [...state.sightings, ...ebirdSightings];
@@ -496,7 +530,7 @@ function feedItemHTML(s) {
   const isYours = s.source === 'home' || s.source === 'manual' || s.source === 'csv';
   const dotClass = s.source === 'ebird' ? 'moss' : isToday(s.observed_at) ? 'gold' : 'rust';
   const time = formatTime(s.observed_at);
-  const sourceLabel = s.source === 'ebird' ? 'nearby' : s.source === 'home' ? 'your yard' : s.source === 'csv' ? 'eBird' : '';
+  const sourceLabel = s.source === 'ebird' ? 'nearby' : s.source === 'csv' ? 'eBird' : '';
   const detail = [s.place_name, sourceLabel].filter(Boolean).join(' · ');
 
   return `

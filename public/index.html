@@ -99,10 +99,25 @@
       </div>
     </div>
 
-    <!-- FAB — Add Sighting -->
-    <button class="fab" id="fab-add" aria-label="Add sighting">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
+    <!-- FAB — Add Entry -->
+    <div class="fab-backdrop" id="fab-backdrop"></div>
+    <div class="fab-container" id="fab-container">
+      <button class="fab-option" data-type="journal" aria-label="Journal entry">
+        <span>✏️</span>
+        <span class="fab-label">Journal</span>
+      </button>
+      <button class="fab-option" data-type="fauna" aria-label="Log fauna">
+        <span>🐾</span>
+        <span class="fab-label">Fauna</span>
+      </button>
+      <button class="fab-option" data-type="flora" aria-label="Log flora">
+        <span>🌿</span>
+        <span class="fab-label">Flora</span>
+      </button>
+      <button class="fab" id="fab-add" aria-label="Add entry">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
 
     <!-- Tab bar -->
     <nav class="tab-bar" aria-label="Main navigation" role="tablist">
@@ -247,10 +262,9 @@
       <form id="form-sighting" autocomplete="off">
         <div class="form-group">
           <div class="type-chips" id="type-chips">
-            <button type="button" class="type-chip active" data-type="bird">Bird</button>
-            <button type="button" class="type-chip" data-type="animal">Animal</button>
-            <button type="button" class="type-chip" data-type="plant">Plant</button>
-            <button type="button" class="type-chip" data-type="moment">Moment</button>
+            <button type="button" class="type-chip active" data-type="fauna">Fauna</button>
+            <button type="button" class="type-chip" data-type="flora">Flora</button>
+            <button type="button" class="type-chip" data-type="journal">Journal</button>
           </div>
         </div>
         <div class="form-group">
