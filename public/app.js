@@ -59,7 +59,7 @@ function initTabs() {
       document.getElementById(target).classList.add('active');
 
       voiceWrap.style.display = target === 'view-map' ? '' : 'none';
-      fab.style.display = target === 'view-deck' ? 'none' : '';
+      fab.style.display = target === 'view-explore' ? 'none' : '';
 
       // Scroll view container to top on tab switch
       document.querySelector('.view-container').scrollTop = 0;
@@ -83,9 +83,26 @@ function initModal() {
   document.getElementById('input-date').value = now.toISOString().split('T')[0];
   document.getElementById('input-time').value = now.toTimeString().slice(0, 5);
 
+  // Type chip selection
+  const typeChips = document.querySelectorAll('.type-chip');
+  let selectedType = 'bird';
+  const placeholders = { bird: 'e.g., Vaux\'s Swift', animal: 'e.g., Coyote', plant: 'e.g., Douglas Fir', moment: 'e.g., Sunset over the rooftops' };
+  const labels = { bird: 'What was it?', animal: 'What did you see?', plant: 'What is it?', moment: 'Describe the moment' };
+
+  typeChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      typeChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedType = chip.dataset.type;
+      document.getElementById('input-species').placeholder = placeholders[selectedType];
+      document.getElementById('input-species-label').textContent = labels[selectedType];
+      const countGroup = document.getElementById('input-count').closest('.form-group');
+      countGroup.style.display = selectedType === 'moment' ? 'none' : '';
+    });
+  });
+
   fab.addEventListener('click', () => {
     openOverlay(overlay);
-    // Reset to manual form
     form.style.display = '';
     csvSection.style.display = 'none';
     // Refresh date/time
@@ -123,11 +140,12 @@ function initModal() {
     const sighting = {
       common_name: species,
       observed_at,
-      count: count ? parseInt(count) : 1,
+      count: selectedType === 'moment' ? null : (count ? parseInt(count) : 1),
       notes: notes || null,
       lat: HOME.lat,
       lon: HOME.lon,
       source: 'manual',
+      type: selectedType,
     };
 
     // Save locally immediately for responsiveness
@@ -384,7 +402,7 @@ function renderAll() {
   renderVoiceLine();
   renderTodayFeed();
   renderJournal();
-  renderDeck();
+  renderExplore();
   renderMapPins();
 }
 
@@ -577,9 +595,113 @@ const BIRD_ICONS = {
   'Eastern Bluebird': '💙',
 };
 
-function renderDeck() {
-  const grid = document.getElementById('deck-grid');
-  const stats = document.getElementById('deck-stats');
+function renderExplore() {
+  renderExplorePrompt();
+  renderExploreQuests();
+  renderExploreStats();
+  renderExploreCollection();
+}
+
+function renderExplorePrompt() {
+  const icon = document.getElementById('prompt-icon');
+  const text = document.getElementById('prompt-text');
+  const meta = document.getElementById('prompt-meta');
+  const subtitle = document.getElementById('explore-subtitle');
+
+  const hour = new Date().getHours();
+  const todaySightings = state.sightings.filter(s => isToday(s.observed_at));
+  const speciesCount = new Set(state.sightings.map(s => s.common_name)).size;
+
+  subtitle.textContent = `${speciesCount} species nearby`;
+
+  const prompts = [];
+  if (hour < 9) {
+    prompts.push({ i: '🌅', t: 'The dawn chorus is happening right now. Step outside and listen — what do you hear?', m: 'best before 8am' });
+  } else if (hour < 12) {
+    prompts.push({ i: '☀️', t: 'Good morning for a walk. The neighborhood has been active today.', m: `${todaySightings.length} sightings so far` });
+  } else if (hour < 17) {
+    prompts.push({ i: '🌿', t: 'Afternoon light is good for noticing things. What\'s blooming on your block?', m: 'log a plant, animal, or moment' });
+  } else if (hour < 20) {
+    prompts.push({ i: '🌆', t: 'Evening walk? The crows are heading to roost. Follow them.', m: 'golden hour' });
+  } else {
+    prompts.push({ i: '🌙', t: 'Listen to the night. What\'s still awake out there?', m: 'night sounds' });
+  }
+
+  if (state.sightings.length > 0) {
+    const recent = state.sightings[0];
+    prompts.push({ i: '📍', t: `A ${recent.common_name.toLowerCase()} was seen nearby. Can you spot one too?`, m: recent.place_name || 'your neighborhood' });
+  }
+
+  const prompt = prompts[Math.floor(Math.random() * prompts.length)];
+  icon.textContent = prompt.i;
+  text.textContent = prompt.t;
+  meta.textContent = prompt.m;
+}
+
+function renderExploreQuests() {
+  const container = document.getElementById('explore-quests');
+  const todaySpecies = new Set(state.sightings.filter(s => isToday(s.observed_at)).map(s => s.common_name));
+  const totalSpecies = new Set(state.sightings.map(s => s.common_name)).size;
+
+  const quests = [
+    {
+      icon: '🚶',
+      title: 'Take the long way home',
+      desc: 'Walk a different route today. Log anything alive you notice — bird, plant, bug, or moment.',
+      reward: 'Explorer badge',
+    },
+    {
+      icon: '🌳',
+      title: 'Name three plants on your block',
+      desc: 'Look at what\'s growing. A tree, a flower, a weed — they\'re all neighbors.',
+      reward: 'Botanist badge',
+    },
+    {
+      icon: '👂',
+      title: 'Stand still for one minute',
+      desc: 'Close your eyes outside. Count the different sounds you hear.',
+      reward: 'Listener badge',
+    },
+  ];
+
+  if (todaySpecies.size < 3) {
+    quests.unshift({
+      icon: '🔭',
+      title: `Spot ${3 - todaySpecies.size} more species today`,
+      desc: `You've seen ${todaySpecies.size} so far. Three is the daily rhythm.`,
+      reward: 'Daily rhythm badge',
+    });
+  }
+
+  container.innerHTML = quests.slice(0, 3).map(q => `
+    <div class="explore-card quest-card">
+      <div class="quest-icon">${q.icon}</div>
+      <div>
+        <div class="quest-title">${q.title}</div>
+        <div class="quest-desc">${q.desc}</div>
+        <div class="quest-reward">${q.reward}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderExploreStats() {
+  const container = document.getElementById('explore-stats');
+  const totalSpecies = new Set(state.sightings.map(s => s.common_name)).size;
+  const totalSightings = state.sightings.length;
+  const yourSightings = state.sightings.filter(s => s.source === 'home' || s.source === 'manual' || s.source === 'csv').length;
+  const nearbySightings = state.sightings.filter(s => s.source === 'ebird').length;
+
+  container.innerHTML = `
+    <div class="stat-row"><span class="stat-label">Species nearby</span><span class="stat-value">${totalSpecies}</span></div>
+    <div class="stat-row"><span class="stat-label">Total sightings</span><span class="stat-value">${totalSightings}</span></div>
+    <div class="stat-row"><span class="stat-label">Your observations</span><span class="stat-value">${yourSightings}</span></div>
+    <div class="stat-row"><span class="stat-label">Neighborhood activity</span><span class="stat-value">${nearbySightings}</span></div>
+  `;
+}
+
+function renderExploreCollection() {
+  const grid = document.getElementById('explore-collection');
 
   if (state.species.length === 0) {
     grid.innerHTML = `
@@ -588,18 +710,13 @@ function renderDeck() {
         <p>Your collection starts here.</p>
         <span class="hint">Each new species unlocks a card.</span>
       </div>`;
-    stats.textContent = '';
     return;
   }
-
-  const seen = state.species.filter(s => s.sighting_count > 0);
-  stats.textContent = `${seen.length} seen`;
 
   grid.innerHTML = state.species.map(sp => {
     const isSeen = sp.sighting_count > 0;
     const icon = BIRD_ICONS[sp.common_name] || BIRD_ICONS.default;
     const badge = sp.last_seen && isToday(sp.last_seen) ? '<div class="card-badge"></div>' : '';
-
     return `
       <div class="deck-card ${isSeen ? 'seen' : 'unseen'}">
         ${badge}

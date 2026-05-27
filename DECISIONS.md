@@ -128,8 +128,47 @@ working v1, then iterate with her on v2.
   core tabs (Map, Journal, Birds) remain the heart of the app. Bingo
   is a delightful extra, not the front door.
 - **What doesn't change:** Core purpose (neighborhood as character),
-  emotional register (calm, slow, intimate), three-layer data model
-  (Map, Journal, Deck).
+  emotional register (calm, slow, intimate).
+
+### 2026-05-27 — THE PIVOT: Interactive Ecosystem Neighborhood Journal
+
+- **Decision:** Roost pivots from "birding companion" to "living journal
+  of your neighborhood as an ecosystem." Three pillars: **Map** (what's
+  alive now), **Journal** (what we've noticed), **Explore** (what to
+  notice next). The "Birds/Deck" tab is replaced by Explore.
+- **Why:** Joelle's v1 feedback — Merlin already does bird ID, sighting
+  logging, and species lists. Roost can't out-Merlin Merlin. The
+  differentiator is that **Roost knows YOUR block.** Not birds globally —
+  your streets, your seasons, your coyote, your blooming dogwood.
+- **What Roost is now:**
+  - A living journal that keeps itself alive via API data (eBird, weather)
+    even when you don't log anything — "the heartbeat"
+  - A personal journal you add to when you notice things — birds, plants,
+    animals, weather moments, anything alive
+  - An exploration engine that gives you reasons to walk outside — quests,
+    walk suggestions, weather-aware prompts, neighborhood discoveries
+  - A portrait of your specific place that compounds over time — streets
+    develop personalities, seasons have storylines, your block is a character
+- **The three tabs:**
+  - **Map** — what's alive right now. API heartbeat + your pins. Streets
+    with personality labels. Weather context.
+  - **Journal** — what you've noticed. Chronological, all creatures/plants,
+    field-journal voice. Low friction to add. Rich over time.
+  - **Explore** — what to notice next. Walk suggestions, quests, seasonal
+    storylines, weather-aware prompts. The screen Merlin doesn't have.
+- **Emotional register (updated):** Still calm and intimate, but now also
+  *playful and inviting.* Notifications, streaks, and gamification are OK
+  if tasteful. No fear/shame mechanics (no dying pets, no punishing missed
+  days). The core is celebrating being part of the neighborhood. Finding
+  moments of awe in each other, daily.
+- **What moves to settings/menu:** Bingo, trophy case, CSV import, auth
+  token, studio links. If it's not Map, Journal, or Explore, it lives in
+  the gear menu or it doesn't make the cut.
+- **What expands:** Sighting logger now accepts any creature or plant, not
+  just birds. The data model broadens from "species" to "observations" of
+  all living things.
+- **What Merlin keeps:** Bird ID, audio recognition, species database.
+  Roost doesn't compete on identification. Roost competes on *meaning.*
 
 ### Build Tracker
 
