@@ -23,6 +23,20 @@ let state = {
   mapReady: false,
 };
 
+const STORAGE_KEY = 'roost-observations';
+
+function saveLocal() {
+  const manual = state.sightings.filter(s => s.source === 'manual' || s.source === 'csv');
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(manual)); } catch (_) {}
+}
+
+function loadLocal() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return Array.isArray(saved) ? saved : [];
+  } catch (_) { return []; }
+}
+
 // ----------------------------------------------------------------
 // Init
 // ----------------------------------------------------------------
@@ -170,42 +184,35 @@ function initModal() {
 
     const observed_at = date && time ? `${date}T${time}:00` : new Date().toISOString();
 
-    const sighting = {
+    const observation = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+      type: selectedType,
+      title: species,
       common_name: species,
       observed_at,
-      count: selectedType === 'journal' ? null : (count ? parseInt(count) : 1),
-      notes: notes || null,
       lat: HOME.lat,
       lon: HOME.lon,
       source: 'manual',
-      type: selectedType,
+      zone: 'yard',
+      count: selectedType === 'journal' ? null : (count ? parseInt(count) : 1),
+      notes: notes || null,
     };
 
-    // Save locally immediately for responsiveness
-    const localEntry = {
-      id: Date.now(),
-      ...sighting,
-      species_code: null,
-      scientific_name: null,
-      place_name: null,
-    };
-    state.sightings.unshift(localEntry);
+    state.sightings.unshift(observation);
+    saveLocal();
     renderAll();
 
     closeOverlay(overlay);
     form.reset();
     toast(`${species} added to your journal`);
 
-    // Try to save to API
     try {
       await fetch(`${API}/sightings`, {
         method: 'POST',
         headers: authHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify(sighting),
+        body: JSON.stringify(observation),
       });
-    } catch (_) {
-      // Offline — sighting is in local state, will sync later
-    }
+    } catch (_) {}
   });
 }
 
@@ -357,24 +364,27 @@ function parseCSVLine(line) {
 // Data Loading
 // ----------------------------------------------------------------
 async function loadData() {
+  // Local observations are the foundation
+  state.sightings = loadLocal();
+
+  // Layer in server-side observations
   try {
-    const [sRes, spRes] = await Promise.all([
-      fetch(`${API}/sightings?limit=200`),
-      fetch(`${API}/species`),
-    ]);
+    const sRes = await fetch(`${API}/sightings?limit=200`);
     if (sRes.ok) {
       const data = await sRes.json();
-      state.sightings = data.sightings || [];
+      const serverObs = (data.sightings || []).map(s => ({
+        ...s,
+        common_name: s.common_name || s.title,
+        title: s.title || s.common_name,
+      }));
+      const localIds = new Set(state.sightings.map(s => s.id));
+      for (const obs of serverObs) {
+        if (!localIds.has(obs.id)) state.sightings.push(obs);
+      }
     }
-    if (spRes.ok) {
-      const data = await spRes.json();
-      state.species = data.species || [];
-    }
-  } catch (_) {
-    // Offline — use whatever's in local state
-  }
+  } catch (_) {}
 
-  // Load eBird ambient data with smart proximity matching
+  // Layer in eBird ambient data with proximity matching
   try {
     const ebirdRes = await fetch(`${API}/ebird-nearby`);
     if (ebirdRes.ok) {
@@ -385,6 +395,8 @@ async function loadData() {
         const isBlock = distM < 250;
         return {
           id: 'ebird-' + obs.species_code + '-' + obs.observed_at,
+          type: 'fauna',
+          title: obs.common_name,
           common_name: obs.common_name,
           scientific_name: obs.scientific_name,
           species_code: obs.species_code,
@@ -394,13 +406,12 @@ async function loadData() {
           count: obs.count,
           place_name: isYard ? 'Your yard' : isBlock ? 'Your block' : obs.location_name,
           source: isBlock ? 'home' : 'ebird',
+          zone: isYard ? 'yard' : isBlock ? 'block' : 'nearby',
         };
       });
       state.sightings = [...state.sightings, ...ebirdSightings];
     }
-  } catch (_) {
-    // eBird unavailable — app works fine without it
-  }
+  } catch (_) {}
 
   rebuildSpeciesFromSightings();
   renderAll();
@@ -910,6 +921,25 @@ function initDrawer() {
       authStatus.textContent = 'Token saved ✓';
       toast('Auth token saved');
     }
+  });
+
+  // Export
+  document.getElementById('btn-export').addEventListener('click', () => {
+    const manual = state.sightings.filter(s => s.source === 'manual' || s.source === 'csv');
+    const data = {
+      exported_at: new Date().toISOString(),
+      version: 2,
+      count: manual.length,
+      observations: manual,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `roost-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Data exported');
   });
 }
 
