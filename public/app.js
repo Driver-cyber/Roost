@@ -381,8 +381,8 @@ async function loadData() {
       const data = await ebirdRes.json();
       const ebirdSightings = (data.observations || []).map(obs => {
         const distM = haversineM(HOME.lat, HOME.lon, obs.lat, obs.lon);
-        const isYard = distM < 150;
-        const isBlock = distM < 457;
+        const isYard = distM < 100;
+        const isBlock = distM < 250;
         return {
           id: 'ebird-' + obs.species_code + '-' + obs.observed_at,
           common_name: obs.common_name,
