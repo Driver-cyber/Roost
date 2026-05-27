@@ -63,16 +63,10 @@ const JOURNAL_PROMPTS = [
 // Quick Add Helpers
 // ----------------------------------------------------------------
 function getFrequentSpecies() {
-  const obs = loadLocal();
   const counts = {};
-  for (const o of obs) {
-    if (o.type === 'fauna' && o.title) {
-      counts[o.title] = (counts[o.title] || 0) + 1;
-    }
-  }
-  // Also count from current state (includes ebird/home but filter to manual/csv)
+  // Count from current state sightings (all sources merged)
   for (const o of state.sightings) {
-    if ((o.source === 'manual' || o.source === 'csv' || o.source === 'home') && (!o.type || o.type === 'fauna') && o.common_name) {
+    if ((!o.type || o.type === 'fauna') && (o.title || o.common_name)) {
       const name = o.title || o.common_name;
       counts[name] = (counts[name] || 0) + 1;
     }
@@ -102,7 +96,8 @@ function openQuickAddTray() {
     hint.textContent = 'Tap to log instantly with current time & home location';
 
     chips.querySelectorAll('.quickadd-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
+      chip.addEventListener('click', (e) => {
+        e.stopPropagation();
         const speciesName = chip.dataset.species;
         const now = new Date();
         const observation = {
@@ -329,7 +324,10 @@ function initModal() {
   });
 
   // Quick Add tray close
-  document.getElementById('quickadd-close').addEventListener('click', closeQuickAddTray);
+  document.getElementById('quickadd-close').addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeQuickAddTray();
+  });
 
   // Close quickadd tray when tapping outside (on the fab backdrop area)
   document.addEventListener('click', (e) => {
