@@ -1,4 +1,4 @@
-const CACHE_NAME = 'roost-v13';
+const CACHE_NAME = 'roost-v14';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
