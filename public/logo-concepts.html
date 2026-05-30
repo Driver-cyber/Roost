@@ -23,7 +23,7 @@
 body {
   background: #e8e0d0;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  padding: 24px 16px;
+  padding: 24px 16px 60px;
   min-height: 100vh;
 }
 
@@ -50,15 +50,13 @@ h1 {
 .concepts {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 48px;
   align-items: center;
   max-width: 420px;
   margin: 0 auto;
 }
 
-.concept {
-  width: 100%;
-}
+.concept { width: 100%; }
 
 .concept-label {
   font-family: 'DM Mono', monospace;
@@ -70,39 +68,47 @@ h1 {
   padding-left: 4px;
 }
 
+.concept-name {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--ink);
+  margin-bottom: 6px;
+  padding-left: 4px;
+}
+
 .concept-desc {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--ink-soft);
-  margin-bottom: 14px;
-  padding-left: 4px;
+  margin-bottom: 16px;
+  padding: 0 4px;
   line-height: 1.5;
 }
 
-/* Phone mockup */
+/* Phone mockup — clean, no notch/island */
 .phone {
   width: 100%;
   max-width: 380px;
   background: var(--paper);
-  border-radius: 32px;
+  border-radius: 28px;
   border: 2px solid #d4cbb8;
   box-shadow: 0 12px 40px rgba(43, 34, 24, 0.12);
   overflow: hidden;
   margin: 0 auto;
 }
 
-.phone-screen {
-  padding: 0;
-}
+.phone-screen { padding: 0; }
 
-/* Status bar */
+/* Status bar (clean iOS-style, no island) */
 .status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 24px 0;
+  padding: 12px 24px 6px;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--ink);
 }
@@ -111,40 +117,56 @@ h1 {
   display: flex;
   gap: 4px;
   align-items: center;
-}
-
-.status-icons span {
   font-size: 0.6rem;
 }
 
-/* Dynamic Island */
-.island {
-  width: 120px;
-  height: 36px;
-  background: #1a1410;
-  border-radius: 20px;
-  margin: 6px auto;
-  position: relative;
+/* The header area — where logos live */
+.header-area {
+  padding: 16px 16px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ece5d6;
 }
 
-.island::after {
-  content: '';
-  width: 10px;
-  height: 10px;
-  background: #2a2420;
-  border-radius: 50%;
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
+.header-area .logo-slot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Map peek */
+.gear {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.gear svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Voice line below header */
+.phone-voice {
+  padding: 12px 24px 8px;
+  text-align: center;
+}
+
+.phone-voice p {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+/* Map peek for context */
 .map-peek {
   height: 140px;
   background: #e8e2d4;
-  margin: 0 12px;
-  border-radius: 14px;
+  margin: 4px 12px 12px;
+  border-radius: 12px;
   border: 1px solid #d4cbb8;
   position: relative;
   overflow: hidden;
@@ -173,299 +195,138 @@ h1 {
 .map-peek .pin.gold { background: var(--gold); }
 .map-peek .pin.moss { background: var(--moss); width: 7px; height: 7px; opacity: 0.6; }
 
-.phone-tabs {
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0 14px;
-  border-top: 1px solid #e8dfd0;
-  margin-top: 12px;
-}
-
-.phone-tabs span {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.55rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ink-faint);
-}
-
-.phone-tabs span.active { color: var(--rust); }
-
 /* ============================================================
-   CONCEPT A — "OO as eyes"
-   The double-O in Roost wraps the Dynamic Island, making
-   the pill look like it belongs between two watchful eyes.
+   CONCEPT A — Pure wordmark
+   Just "Roost" in Fraunces italic, balanced beside the gear.
    ============================================================ */
 
 .logo-a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 0 14px;
-  position: relative;
-}
-
-.logo-a .r {
   font-family: 'Fraunces', serif;
   font-style: italic;
   font-weight: 500;
-  font-size: 2.2rem;
+  font-size: 1.5rem;
   color: var(--ink);
-  letter-spacing: -0.02em;
-  margin-right: -2px;
-}
-
-.logo-a .oo-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  position: relative;
-  margin: 0 -1px;
-}
-
-.logo-a .o-letter {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-weight: 300;
-  font-size: 2.4rem;
-  color: var(--rust);
-  opacity: 0.5;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
-.logo-a .island-inline {
-  width: 120px;
-  height: 36px;
-  background: #1a1410;
-  border-radius: 20px;
-  margin: 0 -14px;
-  position: relative;
-  z-index: 2;
-}
-
-.logo-a .island-inline::after {
-  content: '';
-  width: 10px;
-  height: 10px;
-  background: #2a2420;
-  border-radius: 50%;
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.logo-a .st {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-weight: 500;
-  font-size: 2.2rem;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-  margin-left: -2px;
-}
-
-.logo-a-voice {
-  text-align: center;
-  padding: 0 20px 12px;
-}
-
-.logo-a-voice p {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-}
-
 /* ============================================================
-   CONCEPT B — "Nesting above"
-   Roost text sits right above the island, like a bird
-   perched on a branch. Airy, delicate, wide-tracked.
+   CONCEPT B — Nest mark + wordmark lockup
+   The egg-in-nest icon next to "Roost"
    ============================================================ */
 
 .logo-b {
-  text-align: center;
-  padding: 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-b .mark {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
 }
 
 .logo-b .wordmark {
   font-family: 'Fraunces', serif;
   font-style: italic;
-  font-weight: 400;
-  font-size: 1.6rem;
-  letter-spacing: 0.28em;
-  color: var(--ink);
-  text-transform: lowercase;
-  margin-bottom: -6px;
-  position: relative;
-}
-
-.logo-b .wordmark .accent {
-  color: var(--rust);
   font-weight: 500;
-}
-
-.logo-b .island-perch {
-  width: 120px;
-  height: 36px;
-  background: #1a1410;
-  border-radius: 20px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.logo-b .island-perch::after {
-  content: '';
-  width: 10px;
-  height: 10px;
-  background: #2a2420;
-  border-radius: 50%;
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.logo-b-tagline {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.52rem;
-  color: var(--ink-faint);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  text-align: center;
-  margin-top: 8px;
-  padding-bottom: 10px;
-}
-
-.logo-b-voice {
-  text-align: center;
-  padding: 0 20px 12px;
-}
-
-.logo-b-voice p {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
+  font-size: 1.4rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1;
 }
 
 /* ============================================================
-   CONCEPT C — "Split monogram"
-   R on the left, ST on the right, island is the OO.
-   Minimal, typographic, the island IS part of the word.
+   CONCEPT C — Wordmark with hidden bird
+   The dot of the (no i) — instead the second "o" has a tiny
+   bird silhouette tucked inside, or the OO frames a small bird.
    ============================================================ */
 
 .logo-c {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: 4px 0 8px;
-}
-
-.logo-c .letter-r {
-  font-family: 'Fraunces', serif;
-  font-weight: 600;
-  font-style: italic;
-  font-size: 1.8rem;
-  color: var(--rust-deep);
-  margin-right: 6px;
-  line-height: 1;
-}
-
-.logo-c .island-oo {
-  width: 120px;
-  height: 36px;
-  background: #1a1410;
-  border-radius: 20px;
   position: relative;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.logo-c .bird-tuck {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin: 0 -2px;
+  position: relative;
+  top: -3px;
+}
+
+/* ============================================================
+   CONCEPT D — Tucked monogram
+   Just a small "R" mark with the nest motif. Minimal.
+   ============================================================ */
+
+.logo-d {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
 }
 
-.logo-c .island-oo::after {
-  content: '';
-  width: 10px;
-  height: 10px;
-  background: #2a2420;
+.logo-d .monogram {
+  width: 36px;
+  height: 36px;
+  background: var(--rust);
   border-radius: 50%;
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.logo-c .island-oo .oo-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Fraunces', serif;
-  font-weight: 400;
   font-style: italic;
-  font-size: 1.1rem;
-  color: rgba(244, 237, 224, 0.7);
-  letter-spacing: 0.3em;
-  padding-left: 0.15em;
-}
-
-.logo-c .letter-st {
-  font-family: 'Fraunces', serif;
   font-weight: 600;
-  font-style: italic;
-  font-size: 1.8rem;
-  color: var(--rust-deep);
-  margin-left: 6px;
-  line-height: 1;
+  font-size: 1.15rem;
+  color: var(--paper);
+  position: relative;
+  flex-shrink: 0;
 }
 
-.logo-c-sub {
-  text-align: center;
-  font-family: 'DM Mono', monospace;
-  font-size: 0.5rem;
-  color: var(--ink-faint);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  padding: 2px 0 8px;
+.logo-d .monogram::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--gold);
+  border-radius: 50%;
+  bottom: 7px;
+  right: 9px;
 }
 
-.logo-c-voice {
-  text-align: center;
-  padding: 4px 20px 12px;
-}
-
-.logo-c-voice p {
+.logo-d .wordmark {
   font-family: 'Fraunces', serif;
   font-style: italic;
   font-weight: 400;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-}
-
-/* Gear icon for all */
-.gear {
-  position: absolute;
-  right: 16px;
-  color: var(--ink-faint);
-}
-
-.gear svg {
-  width: 18px;
-  height: 18px;
+  font-size: 1.25rem;
+  color: var(--ink);
+  letter-spacing: 0.02em;
 }
 </style>
 </head>
 <body>
 
 <h1>Roost Logo Concepts</h1>
-<p class="subtitle">Three ways to live with the Dynamic Island</p>
+<p class="subtitle">Four directions for the wordmark</p>
 
 <div class="concepts">
 
   <!-- ======================== CONCEPT A ======================== -->
   <div class="concept">
-    <div class="concept-label">Concept A — "The OO"</div>
-    <div class="concept-desc">The double-O in Roost wraps the Dynamic Island. The pill becomes part of the letterform — two O's cradling the camera like a pair of owl eyes.</div>
+    <div class="concept-label">Concept A</div>
+    <div class="concept-name">Wordmark only</div>
+    <div class="concept-desc">Just "Roost" in italic Fraunces, balanced against the gear icon. Quietest option. Lets the typography do all the work — like a signature at the top of the page.</div>
     <div class="phone">
       <div class="phone-screen">
         <div class="status-bar">
@@ -475,19 +336,15 @@ h1 {
             <span>🔋</span>
           </div>
         </div>
-        <div class="logo-a">
-          <span class="r">R</span>
-          <div class="oo-wrap">
-            <span class="o-letter">o</span>
-            <div class="island-inline"></div>
-            <span class="o-letter">o</span>
+        <div class="header-area">
+          <div class="logo-slot">
+            <div class="logo-a">Roost</div>
           </div>
-          <span class="st">st</span>
-          <div class="gear" style="top: 50%; transform: translateY(-50%);">
+          <div class="gear">
             <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           </div>
         </div>
-        <div class="logo-a-voice">
+        <div class="phone-voice">
           <p>A coyote crossed your block at dawn.</p>
         </div>
         <div class="map-peek">
@@ -497,19 +354,15 @@ h1 {
           <div class="pin moss" style="top:25%;left:30%"></div>
           <div class="pin moss" style="top:70%;left:65%"></div>
         </div>
-        <div class="phone-tabs">
-          <span class="active">Map</span>
-          <span>Journal</span>
-          <span>Birds</span>
-        </div>
       </div>
     </div>
   </div>
 
   <!-- ======================== CONCEPT B ======================== -->
   <div class="concept">
-    <div class="concept-label">Concept B — "Perched"</div>
-    <div class="concept-desc">The wordmark nests directly above the Dynamic Island, like a bird settling onto a branch. Wide letter-spacing, light weight, airy.</div>
+    <div class="concept-label">Concept B</div>
+    <div class="concept-name">Mark + wordmark lockup</div>
+    <div class="concept-desc">The nest icon (small, simplified) next to "Roost." Reads as a proper brand mark — recognizable even at favicon size. The egg-in-nest already signals the journal/home/nurture register.</div>
     <div class="phone">
       <div class="phone-screen">
         <div class="status-bar">
@@ -519,12 +372,26 @@ h1 {
             <span>🔋</span>
           </div>
         </div>
-        <div class="logo-b">
-          <div class="wordmark"><span class="accent">r</span>oost</div>
-          <div class="island-perch"></div>
-          <div class="logo-b-tagline">your neighborhood, alive</div>
+        <div class="header-area">
+          <div class="logo-slot">
+            <div class="logo-b">
+              <svg class="mark" viewBox="0 0 64 64" fill="none">
+                <!-- Mini nest -->
+                <path d="M10,30 Q8,46 18,52 Q32,58 46,52 Q56,46 54,30" stroke="#7a5a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                <path d="M13,33 Q12,44 21,48 Q32,54 43,48 Q52,44 51,33" stroke="#b8943e" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <!-- Egg -->
+                <ellipse cx="32" cy="30" rx="11" ry="14" fill="#faf5eb" stroke="#e8dece" stroke-width="1" transform="rotate(-6 32 30)"/>
+                <circle cx="29" cy="25" r="0.8" fill="#c4a97a"/>
+                <circle cx="34" cy="32" r="0.6" fill="#c4a97a"/>
+              </svg>
+              <div class="wordmark">Roost</div>
+            </div>
+          </div>
+          <div class="gear">
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </div>
         </div>
-        <div class="logo-b-voice">
+        <div class="phone-voice">
           <p>The blackberries on 7th are almost ripe.</p>
         </div>
         <div class="map-peek">
@@ -535,19 +402,15 @@ h1 {
           <div class="pin moss" style="top:20%;left:70%"></div>
           <div class="pin moss" style="top:75%;left:25%"></div>
         </div>
-        <div class="phone-tabs">
-          <span class="active">Map</span>
-          <span>Journal</span>
-          <span>Birds</span>
-        </div>
       </div>
     </div>
   </div>
 
   <!-- ======================== CONCEPT C ======================== -->
   <div class="concept">
-    <div class="concept-label">Concept C — "R · · ST"</div>
-    <div class="concept-desc">The island IS the double-O. R and ST flank it in deep rust. Ghost "oo" letters whisper inside the pill. The hardware becomes typography.</div>
+    <div class="concept-label">Concept C</div>
+    <div class="concept-name">Wordmark with a hidden bird</div>
+    <div class="concept-desc">The second "o" becomes a tiny bird silhouette tucked inside the letterform — like finding a bird in a tree. Typography with a quiet wink. Reads as "Roost" but rewards the eye that looks closer.</div>
     <div class="phone">
       <div class="phone-screen">
         <div class="status-bar">
@@ -557,15 +420,28 @@ h1 {
             <span>🔋</span>
           </div>
         </div>
-        <div class="logo-c">
-          <span class="letter-r">R</span>
-          <div class="island-oo">
-            <span class="oo-text">oo</span>
+        <div class="header-area">
+          <div class="logo-slot">
+            <div class="logo-c">
+              <span>R</span>
+              <span>o</span>
+              <span class="bird-tuck">
+                <svg viewBox="0 0 16 16" fill="none">
+                  <!-- Tiny bird silhouette in place of second o -->
+                  <circle cx="8" cy="8" r="7" stroke="#2b2218" stroke-width="1.5" fill="none"/>
+                  <path d="M5,8 Q7,5 10,7 L11,6 L10.5,8 L11.5,9 L9,9 Q7,10 5,8 Z" fill="#b85c2e"/>
+                  <circle cx="9.5" cy="7.5" r="0.5" fill="#2b2218"/>
+                </svg>
+              </span>
+              <span>s</span>
+              <span>t</span>
+            </div>
           </div>
-          <span class="letter-st">st</span>
+          <div class="gear">
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </div>
         </div>
-        <div class="logo-c-sub">finding awe in each other, daily</div>
-        <div class="logo-c-voice">
+        <div class="phone-voice">
           <p>Rain on the leaves. The whole world for five minutes.</p>
         </div>
         <div class="map-peek">
@@ -574,12 +450,45 @@ h1 {
           <div class="pin rust" style="top:55%;left:42%"></div>
           <div class="pin moss" style="top:28%;left:35%"></div>
           <div class="pin moss" style="top:68%;left:62%"></div>
-          <div class="pin moss" style="top:22%;left:68%"></div>
         </div>
-        <div class="phone-tabs">
-          <span class="active">Map</span>
-          <span>Journal</span>
-          <span>Birds</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== CONCEPT D ======================== -->
+  <div class="concept">
+    <div class="concept-label">Concept D</div>
+    <div class="concept-name">Tucked monogram</div>
+    <div class="concept-desc">A small rust "R" circle with a single gold dot (the egg). Wordmark beside it stays light and small. Reads as a proper app icon at any size — could double as the favicon. Most "branded" of the four.</div>
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="status-icons">
+            <span>5G</span>
+            <span>🔋</span>
+          </div>
+        </div>
+        <div class="header-area">
+          <div class="logo-slot">
+            <div class="logo-d">
+              <div class="monogram">R</div>
+              <div class="wordmark">Roost</div>
+            </div>
+          </div>
+          <div class="gear">
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </div>
+        </div>
+        <div class="phone-voice">
+          <p>A vaux's swift was spotted nearby this morning.</p>
+        </div>
+        <div class="map-peek">
+          <div class="grid"></div>
+          <div class="pin gold" style="top:50%;left:50%"></div>
+          <div class="pin rust" style="top:38%;left:60%"></div>
+          <div class="pin moss" style="top:25%;left:25%"></div>
+          <div class="pin moss" style="top:70%;left:70%"></div>
         </div>
       </div>
     </div>
@@ -587,8 +496,8 @@ h1 {
 
 </div>
 
-<div style="text-align:center;padding:40px 0 20px;font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--ink-faint);letter-spacing:0.1em;">
-  SCROLL UP TO COMPARE · TAP NOTHING · JUST FEEL
+<div style="text-align:center;padding:48px 16px 20px;font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--ink-faint);letter-spacing:0.1em;">
+  PICK A DIRECTION OR MIX &amp; MATCH
 </div>
 
 </body>
